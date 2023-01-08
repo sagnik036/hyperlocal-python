@@ -97,45 +97,32 @@ class CustomUser(AbstractUser):
         unique=True,
         db_index=True
     )
-    mobile_number = models.CharField(max_length=50, null=True, blank=True)
+    mobile_number = models.CharField(
+        error_messages={"unique": "A user with that mobile already exists"},
+        max_length=50,
+        unique=True, 
+        null=True, 
+        blank=True
+    )
     is_email_verified = models.BooleanField(default=False)
     is_mobile_verified = models.BooleanField(default=False)
     user_type = models.CharField(
         max_length=20,
         choices=[x.value for x in UserType]
     )
-    application_number = models.CharField(
-        max_length=20
-    )
-    company_name = models.CharField(
-        max_length=50,
-        null=True
-    )
-    office_address = models.TextField(
-        max_length=100,
-        null=True
-    )
-    company_email = models.EmailField(
-        unique=True,
-        null=True
-    )
-    telephone = models.IntegerField()
-    legal_status = models.CharField(
-        max_length=20,
-        null=True
-    )
-    company_registration_date = models.DateField(null=True)
-    company_business_startdate = models.DateField(null=True)
-    pan_or_gir = models.CharField(
-        max_length=20,
-        unique=True
-    )
-    is_submited = models.BooleanField(default=True)
-    is_verified = models.BooleanField(default=False)
-    notification_setting = models.BooleanField(default=True)
-    unread_notification_count = models.PositiveIntegerField(default=0)
 
-    USERNAME_FIELD = 'email'
+    #if user has shop
+    is_shop = models.BooleanField(default=False)
+
+    #auto fields -> to be calculated
+    live_jobs_count = models.PositiveIntegerField(default=0)
+    total_jobs_posted = models.PositiveIntegerField(default=0)
+
+
+    # notification_setting = models.BooleanField(default=True)
+    # unread_notification_count = models.PositiveIntegerField(default=0)
+
+    USERNAME_FIELD = 'mobile_number'
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
 

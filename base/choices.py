@@ -25,8 +25,8 @@ class DeviceType(ChoiceEnum):
 
 
 class UserType(ChoiceEnum):
-    a = ("Company","company")
-    b = ("Lender/Investor","Lender/Investor")
+    a = ("1","company")
+    b = ("2","deliveryperson")
 
 
 
