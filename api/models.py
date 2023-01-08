@@ -1,0 +1,213 @@
+import uuid
+
+from ckeditor.fields import RichTextField
+from django.contrib.auth.models import AbstractUser, UserManager
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.core.validators import FileExtensionValidator
+from base.choices import DeviceType, NotificationType, UserType
+from base.utils import StaticFileStorage
+from base.base_upload_handlers import handle_tnc_document, handle_privacy_policy_document, handle_images, handle_payment_term_document, handle_legal_doccuments
+from strings import *
+
+
+class BaseModel(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class TermAndCondition(BaseModel):
+    text = RichTextField()
+    document = models.FileField(
+        upload_to=handle_tnc_document,
+        storage=StaticFileStorage(),
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+        null=True,
+        blank=True,
+    )
+
+
+class PrivacyPolicy(BaseModel):
+    text = RichTextField()
+    document = models.FileField(
+        upload_to=handle_privacy_policy_document,
+        storage=StaticFileStorage(),
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+        null=True,
+        blank=True,
+    )
+
+
+class PaymentTerm(BaseModel):
+    text = RichTextField()
+    document = models.FileField(
+        upload_to=handle_payment_term_document,
+        storage=StaticFileStorage(),
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+        null=True,
+        blank=True,
+    )
+
+
+class AdminContact(BaseModel):
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.email
+
+
+class CustomUserManager(UserManager):
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Create and save a user with the given username, email, and password.
+        """
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email=None, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+
+
+class CustomUser(AbstractUser):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    username = None
+    email = models.EmailField(
+        error_messages={"unique": "A user with that email already exists"},
+        unique=True,
+        db_index=True
+    )
+    mobile_number = models.CharField(max_length=50, null=True, blank=True)
+    is_email_verified = models.BooleanField(default=False)
+    is_mobile_verified = models.BooleanField(default=False)
+    user_type = models.CharField(
+        max_length=20,
+        choices=[x.value for x in UserType]
+    )
+    application_number = models.CharField(
+        max_length=20
+    )
+    company_name = models.CharField(
+        max_length=50,
+        null=True
+    )
+    office_address = models.TextField(
+        max_length=100,
+        null=True
+    )
+    company_email = models.EmailField(
+        unique=True,
+        null=True
+    )
+    telephone = models.IntegerField()
+    legal_status = models.CharField(
+        max_length=20,
+        null=True
+    )
+    company_registration_date = models.DateField(null=True)
+    company_business_startdate = models.DateField(null=True)
+    pan_or_gir = models.CharField(
+        max_length=20,
+        unique=True
+    )
+    is_submited = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
+    notification_setting = models.BooleanField(default=True)
+    unread_notification_count = models.PositiveIntegerField(default=0)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    objects = CustomUserManager()
+
+    def save(self, *args, **kwargs):
+
+        if self.mobile_number:
+            if CustomUser.objects.filter(
+                    mobile_number=self.mobile_number).exclude(id=self.id).exists():
+                raise ValidationError(MOBILE_EXISTS)
+        super().save(*args, **kwargs)
+
+    def validate_unique(self, exclude=None):
+
+        if not self.email.islower():
+            self.email = self.email.lower()
+        super().validate_unique(exclude=['id'])
+
+    class Meta:
+        ordering = ('first_name',)
+        verbose_name_plural = 'Users'
+        verbose_name = 'User'
+
+
+class DeviceToken(BaseModel):
+    device_type = models.CharField(max_length=10, choices=[
+                                   x.value for x in DeviceType])
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    token = models.TextField()
+
+    class Meta:
+        ordering = ('-created_at',)
+
+
+class UserNotification(BaseModel):
+    notification_type = models.CharField(
+        max_length=20, choices=[x.value for x in NotificationType])
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    title = models.CharField(max_length=250)
+    body = models.CharField(max_length=500)
+    is_read = models.BooleanField(default=False)
+    admin_notification = models.ForeignKey(
+        'AdminNotification', on_delete=models.SET_NULL, null=True)
+    data_id = models.CharField(max_length=250, null=True, blank=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+
+
+class AdminNotification(BaseModel):
+    title = models.CharField(max_length=200)
+    description = models.CharField(max_length=250)
+    # to indicate admin that this notification was sent to all
+    sent_to_all = models.BooleanField(default=False)
+    recipients = models.ManyToManyField(CustomUser, blank=True,
+                                        help_text="<b>Note:It will send the notification to the selected user only.</b>")
+
+    class Meta:
+        ordering = ('-created_at',)
+
+
+class FrequentlyAskedQuestion(BaseModel):
+    """
+    To be add by app-admin
+    """
+    question = models.TextField(max_length=2000)
+    answer = models.TextField(max_length=2000)
+
+    def __str__(self):
+        question = self.question
+        if len(question) > 100:
+            question = f"{question[0:100]}...."
+        return question
+
+    class Meta:
+        ordering = ('-created_at',)
