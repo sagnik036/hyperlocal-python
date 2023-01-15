@@ -92,10 +92,10 @@ class UserNotificationSerializer(serializers.ModelSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    notification_setting = serializers.BooleanField(default=True)
     password = serializers.CharField(max_length=100, required=False)
     email = CustomEmailField(
         max_length=254,
+        required = False,
         validators=[UniqueValidator(
             queryset=CustomUser.objects.all(),
             message=EMAIL_EXISTS,
@@ -121,6 +121,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'total_jobs_posted',
             'is_email_verified',
             'is_mobile_verified',
+            'profile_pic',
             'is_superuser',
             'last_login',
              

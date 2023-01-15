@@ -62,22 +62,22 @@ class PaymentTermAdmin(OneObjectAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name')}),
+        ('Credentials', {'fields': ('mobile_number','email', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name','profile_pic')}),
         ('Permissions', {
             'fields': ('is_active', 'is_superuser'),
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
-        (None, {
+        ('Credentials', {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2'),
+            'fields': ('mobile_number','email','password1', 'password2'),
         }),
     )
-    list_display = ('email', 'first_name', 'last_name', 'is_active',)
-    list_filter = ('is_superuser', 'is_active')
-    search_fields = ('first_name', 'last_name', 'email')
+    list_display = ('mobile_number','first_name', 'last_name', 'is_active','user_type')
+    list_filter = ('is_superuser', 'is_active','user_type')
+    search_fields = ('first_name', 'last_name', 'mobile_number')
     ordering = ('first_name',)
 
 

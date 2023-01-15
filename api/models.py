@@ -62,22 +62,21 @@ class AdminContact(BaseModel):
 
 
 class CustomUserManager(UserManager):
-    def _create_user(self, email, password, **extra_fields):
+    def _create_user(self, mobile_number, password, **extra_fields):
         """
-        Create and save a user with the given username, email, and password.
+        Create and save a user with the given username, mobile_number, and password.
         """
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(mobile_number=mobile_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email=None, password=None, **extra_fields):
+    def create_user(self, mobile_number=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        return self._create_user(email, password, **extra_fields)
+        return self._create_user(mobile_number, password, **extra_fields)
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, mobile_number, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -86,29 +85,34 @@ class CustomUserManager(UserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(email, password, **extra_fields)
+        return self._create_user(mobile_number, password, **extra_fields)
 
 
 class CustomUser(AbstractUser):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     username = None
+    profile_pic = models.ImageField(
+        upload_to='images/', 
+        blank=True
+    )
     email = models.EmailField(
         error_messages={"unique": "A user with that email already exists"},
-        unique=True,
-        db_index=True
+        null= True,
+        blank= True,
+        unique= True
     )
     mobile_number = models.CharField(
         error_messages={"unique": "A user with that mobile already exists"},
         max_length=50,
-        unique=True, 
-        null=True, 
-        blank=True
+        unique=True,
     )
     is_email_verified = models.BooleanField(default=False)
     is_mobile_verified = models.BooleanField(default=False)
     user_type = models.CharField(
         max_length=20,
-        choices=[x.value for x in UserType]
+        choices=[x.value for x in UserType],
+        blank=True,
+        null= True
     )
 
     #if user has shop
