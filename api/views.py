@@ -437,28 +437,34 @@ class RegistrationView(CustomAPIView):
 
     @transaction.atomic
     def post(self, request):
+        otp_payload = TokenBackend(
+            settings.SIMPLE_JWT['ALGORITHM'],
+            settings.SIMPLE_JWT['SIGNING_KEY']).decode(request.data['token']
+        )
+
+        if not (otp_payload['otp'] == request.data['otp'] or (
+                settings.ENV == 'development' and request.data['otp'] == '111111')):
+            raise CustomException(INVALID_CODE)
+        if not (otp_payload['mobile_number'] == request.data['mobile_number']):
+            raise CustomException(INVALID_CODE)
+        
         serializer = CustomUserSerializer(data=request.data, context={'request': request, 'view': self})
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        
 
-        token = TokenBackend(
-            settings.SIMPLE_JWT['ALGORITHM'],
-            settings.SIMPLE_JWT['SIGNING_KEY']).encode({
-            'email': user.email,
-            'exp': int((timezone.now() + timezone.timedelta(days=1)).timestamp())
-        })
-        link = f"{'https' if request.is_secure() else 'http'}://{request.META['HTTP_HOST']}/verify-email/{token}"
-        admin_contact = AdminContact.objects.first()
-        send_mail_task.apply_async(kwargs={
-            'subject': 'Welcome to USICEF',
-            'html_message': render_to_string('emails/welcome_user.html', context={
-                'link': link,
-                'user_name': user.get_full_name(),
-                'admin_email': admin_contact.email if admin_contact else ''
-            }),
-            'recipient_list': [user.email],
-        })
+
+        #TODO IF WE NEED TO SEND EMAIL
+        # link = f"{'https' if request.is_secure() else 'http'}://{request.META['HTTP_HOST']}/verify-email/{token}"
+        # admin_contact = AdminContact.objects.first()
+        # send_mail_task.apply_async(kwargs={
+        #     'subject': 'Welcome to USICEF',
+        #     'html_message': render_to_string('emails/welcome_user.html', context={
+        #         'link': link,
+        #         'user_name': user.get_full_name(),
+        #         'admin_email': admin_contact.email if admin_contact else ''
+        #     }),
+        #     'recipient_list': [user.email],
+        # })
         return success_response(data=serializer.data, extra_data={'token': get_jwt_auth_token(user)})
 
 
@@ -494,12 +500,9 @@ class RefreshTokenView(CustomGenericView):
 class OTPView(CustomAPIView):
     def initial(self, request, *args, **kwargs):
         if request.method == 'GET':
+            self.permission_classes = (AllowAny, )
             self.throttle_scope = 'OTP'
         super().initial(request, *args, **kwargs)
-        if request.user.mobile_number is None:
-            raise CustomException(ADD_MOBILE_NUMBER)
-        if request.user.is_mobile_verified:
-            raise CustomException(MOBILE_ALREADY_VERIFIED)
 
     def get(self, request):
         """
@@ -507,35 +510,34 @@ class OTPView(CustomAPIView):
         """
         otp = create_otp(6)
         payload = {
-            'user': str(request.user.id),
-            'mobile_number': request.user.mobile_number,
+            'mobile_number': request.data['mobile_number'],
             'otp': otp,
             'exp': int((timezone.now() + timezone.timedelta(minutes=10)).timestamp())
         }
         token = TokenBackend(
             settings.SIMPLE_JWT['ALGORITHM'],
             settings.SIMPLE_JWT['SIGNING_KEY']).encode(payload)
+        
+        #implement the tulio otp sending option
         message = OTP_SENDING_TEXT.format(otp)
-        send_transactional_sms(request.user.mobile_number, message)
+        send_transactional_sms(request.data['mobile_number'], message)
         return success_response(message=CODE_SENT, data={'token': token})
 
-    @transaction.atomic
-    def post(self, request):
-        """
-        to change mobile number
-        """
-        otp_payload = TokenBackend(
-            settings.SIMPLE_JWT['ALGORITHM'],
-            settings.SIMPLE_JWT['SIGNING_KEY']).decode(request.data['token'])
-        if str(request.user.id) != otp_payload['user']:
-            raise CustomException(INVALID_TOKEN)
-        if not (otp_payload['otp'] == request.data['otp'] or (settings.ENV == 'development' and request.data['otp'] == '111111')):
-            raise CustomException(INVALID_CODE)
-        request.user.is_mobile_verified = True
-        request.user.save(update_fields=['is_mobile_verified'])
-        return success_response(message=MOBILE_VERIFIED)
-
-
+    # @transaction.atomic
+    # def post(self, request):
+    #     """
+    #     to change mobile number
+    #     """
+    #     otp_payload = TokenBackend(
+    #         settings.SIMPLE_JWT['ALGORITHM'],
+    #         settings.SIMPLE_JWT['SIGNING_KEY']).decode(request.data['token'])
+    #     if str(request.user.id) != otp_payload['user']:
+    #         raise CustomException(INVALID_TOKEN)
+    #     if not (otp_payload['otp'] == request.data['otp'] or (settings.ENV == 'development' and request.data['otp'] == '111111')):
+    #         raise CustomException(INVALID_CODE)
+    #     request.user.is_mobile_verified = True
+    #     request.user.save(update_fields=['is_mobile_verified'])
+    #     return success_response(message=MOBILE_VERIFIED)
 
 
 class FrequentlyAskedQuestionBaseView(CustomGenericView):
