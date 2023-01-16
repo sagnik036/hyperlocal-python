@@ -3,4 +3,5 @@ db.sqlite3
 media/
 .vscode/
 .idea/
+build_files.sh
 venv
