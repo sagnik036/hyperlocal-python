@@ -416,13 +416,29 @@ class UserNotificationCountAPI(CustomAPIView):
 
 class LoginAPI(CustomAPIView):
     permission_classes = (AllowAny,)
+    
 
     def post(self, request):
-        user = authenticate(
-            request,
-            username=request.data['email'].lower(),
-            password=request.data['password']
-        )
+        user = None
+        if 'otp' not in request.data or not request.data['otp']:
+            user = authenticate(
+                request,
+                username=request.data['mobile_number'],
+                password=request.data['password']
+            )
+        else:
+            otp_payload = TokenBackend(
+                settings.SIMPLE_JWT['ALGORITHM'],
+                settings.SIMPLE_JWT['SIGNING_KEY']).decode(request.data['token']
+            )
+            if not (otp_payload['otp'] == request.data['otp'] or (
+                settings.ENV == 'development' and request.data['otp'] == '111111')):
+                raise CustomException(INVALID_CODE)
+            if not (otp_payload['mobile_number'] == request.data['mobile_number']):
+                raise CustomException(INVALID_CODE)
+            username = '+'+ str(otp_payload['mobile_number'])
+            user = CustomUser.objects.get_by_natural_key(username)
+
         if user is None:
             return error_response(message=CANNOT_LOGIN, code=status.HTTP_401_UNAUTHORIZED)
         CustomUser.objects.filter(id=user.id).update(last_login=timezone.now())
