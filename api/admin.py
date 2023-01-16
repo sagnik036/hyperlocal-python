@@ -13,7 +13,7 @@ from api.task import send_notification_to_users
 from django.db import transaction
 from base.choices import NotificationType
 
-admin.site.site_header = 'USICEF'
+admin.site.site_header = 'HYPERLOCAL-ADMIN'
 admin.site.site_url = None
 
 admin.site.unregister(Group)
