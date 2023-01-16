@@ -57,9 +57,6 @@ class TextSerializer(serializers.Serializer):
         return instance
 
 
-
-
-
 class AdminContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminContact
@@ -95,10 +92,10 @@ class UserNotificationSerializer(serializers.ModelSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    notification_setting = serializers.BooleanField(default=True)
     password = serializers.CharField(max_length=100, required=False)
     email = CustomEmailField(
         max_length=254,
+        required = False,
         validators=[UniqueValidator(
             queryset=CustomUser.objects.all(),
             message=EMAIL_EXISTS,
@@ -118,12 +115,15 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'mobile_number',
+            'user_type',
+            'is_shop',
+            'live_jobs_count',
+            'total_jobs_posted',
             'is_email_verified',
             'is_mobile_verified',
-            'notification_setting',
+            'profile_pic',
             'is_superuser',
             'last_login',
-            'unread_notification_count',
              
             
         )
@@ -131,9 +131,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'date_joined',
             'last_login',
             'is_superuser',
-            'unread_notification_count',
-            
-            
         )
 
     def validate_mobile_number(self, value):
