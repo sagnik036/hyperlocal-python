@@ -1,7 +1,5 @@
-from django.urls import path
 from api import views
-
-
+from django.urls import path
 urlpatterns = [
     path('terms/', views.TermAndConditionAPI.as_view()),
     path('privacy-policy/', views.PrivacyPolicyAPI.as_view()),
