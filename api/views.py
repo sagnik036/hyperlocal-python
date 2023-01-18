@@ -436,7 +436,7 @@ class LoginAPI(CustomAPIView):
                 raise CustomException(INVALID_CODE)
             if not (otp_payload['mobile_number'] == request.data['mobile_number']):
                 raise CustomException(INVALID_CODE)
-            username = '+'+ str(otp_payload['mobile_number'])
+            username = otp_payload['mobile_number']
             user = CustomUser.objects.get_by_natural_key(username)
 
         if user is None:
@@ -526,7 +526,7 @@ class OTPView(CustomAPIView):
         """
         otp = create_otp(6)
         payload = {
-            'mobile_number': request.data['mobile_number'],
+            'mobile_number': '+'+request.data['mobile_number'],
             'otp': otp,
             'exp': int((timezone.now() + timezone.timedelta(minutes=10)).timestamp())
         }
