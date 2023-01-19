@@ -13,8 +13,6 @@ from django.views import View
 from django.db.models import F
 from django.views.generic.list import BaseListView
 
-
-
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
