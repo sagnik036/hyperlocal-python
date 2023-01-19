@@ -246,44 +246,52 @@ class CheckEmail(APIView):
         return success_response(data={"available": available})
 
 
-class PasswordAPI(CustomAPIView):
+class ForgetPasswordAPI(CustomAPIView):
     def initial(self, request, *args, **kwargs):
         if request.method in ('GET', 'POST'):
             self.permission_classes = (AllowAny,)
         super().initial(request, *args, **kwargs)
 
-    def get(self, request):
-        user = CustomUser.objects.only('id', 'email', 'first_name', 'last_name').filter(
-            email__iexact=request.query_params['email']).first()
-        if user is not None:
-            token = TokenBackend(
-                settings.SIMPLE_JWT['ALGORITHM'],
-                settings.SIMPLE_JWT['SIGNING_KEY']).encode({
-                'email': user.email.lower(),
-                'exp': int((timezone.now() + timezone.timedelta(days=1)).timestamp())
-            })
-            link = f"{'https' if request.is_secure() else 'http'}://{request.META['HTTP_HOST']}/reset-password/{token}"
-            admin_contact = AdminContact.objects.first()
-            send_mail_task.apply_async(kwargs={
-                'subject': 'Reset password',
-                'html_message': render_to_string('emails/reset_password.html', context={
-                    'link': link,
-                    'user_name': user.get_full_name(),
-                    'admin_email': admin_contact.email if admin_contact else ''
-                }),
-                'recipient_list': [user.email],
-            })
-            return success_response(message=RESET_PASSWORD_LINK_SENT)
-        return error_response(message=EMAIL_NOT_EXISTS)
+    # def get(self, request):
+    #     user = CustomUser.objects.only('id', 'email', 'first_name', 'last_name').filter(
+    #         email__iexact=request.query_params['email']).first()
+    #     if user is not None:
+    #         token = TokenBackend(
+    #             settings.SIMPLE_JWT['ALGORITHM'],
+    #             settings.SIMPLE_JWT['SIGNING_KEY']).encode({
+    #             'email': user.email.lower(),
+    #             'exp': int((timezone.now() + timezone.timedelta(days=1)).timestamp())
+    #         })
+    #         link = f"{'https' if request.is_secure() else 'http'}://{request.META['HTTP_HOST']}/reset-password/{token}"
+    #         admin_contact = AdminContact.objects.first()
+    #         send_mail_task.apply_async(kwargs={
+    #             'subject': 'Reset password',
+    #             'html_message': render_to_string('emails/reset_password.html', context={
+    #                 'link': link,
+    #                 'user_name': user.get_full_name(),
+    #                 'admin_email': admin_contact.email if admin_contact else ''
+    #             }),
+    #             'recipient_list': [user.email],
+    #         })
+    #         return success_response(message=RESET_PASSWORD_LINK_SENT)
+    #     return error_response(message=EMAIL_NOT_EXISTS)
 
     def post(self, request):
-        token = request.data['token']
-        user_data = TokenBackend(
+        """this is just decoding the otp and mobile number and verifying it"""
+        otp_payload = TokenBackend(
             settings.SIMPLE_JWT['ALGORITHM'],
-            settings.SIMPLE_JWT['SIGNING_KEY']).decode(token)
-        if user_data['exp'] < timezone.now().timestamp():
+            settings.SIMPLE_JWT['SIGNING_KEY']
+        ).decode(request.data['token'])
+
+        if not (otp_payload['otp'] == request.data['otp'] or (
+            settings.ENV == 'development' and request.data['otp'] == '111111')):
+                raise CustomException(INVALID_CODE)
+        if not (otp_payload['mobile_number'] == request.data['mobile_number']):
+                raise CustomException(INVALID_CODE)
+        if otp_payload['exp'] < timezone.now().timestamp():
             raise CustomException(EXPIRED_LINK)
-        user = CustomUser.objects.get(email__iexact=user_data['email'])
+
+        user = CustomUser.objects.get_by_natural_key(otp_payload['mobile_number'])
         serializer = UserPasswordSerializer(instance=user, data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -436,6 +444,7 @@ class LoginAPI(CustomAPIView):
                 raise CustomException(INVALID_CODE)
             if not (otp_payload['mobile_number'] == request.data['mobile_number']):
                 raise CustomException(INVALID_CODE)
+            
             username = otp_payload['mobile_number']
             user = CustomUser.objects.get_by_natural_key(username)
 
@@ -528,7 +537,7 @@ class OTPView(CustomAPIView):
         payload = {
             'mobile_number': '+'+request.data['mobile_number'],
             'otp': otp,
-            'exp': int((timezone.now() + timezone.timedelta(minutes=10)).timestamp())
+            'exp': int((timezone.now() + timezone.timedelta(minutes=5)).timestamp())
         }
         token = TokenBackend(
             settings.SIMPLE_JWT['ALGORITHM'],
