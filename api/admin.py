@@ -63,8 +63,7 @@ class PaymentTermAdmin(OneObjectAdmin):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         ('Credentials', {'fields': ('mobile_number','email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name','profile_pic','adhar_photo_front','adhar_photo_back')}),
-        
+        ('Personal info', {'fields': ('first_name', 'last_name','profile_pic','is_shop','adhar_photo_front','adhar_photo_back')}),  
         ('Permissions', {
             'fields': ('is_active', 'is_superuser','is_adhar_verified'),
         }),
