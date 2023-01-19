@@ -117,6 +117,20 @@ class CustomUser(AbstractUser):
 
     #if user has shop
     is_shop = models.BooleanField(default=False)
+    
+    #adharcard photo
+    adhar_photo_front = models.ImageField(
+        upload_to='images/',
+    )
+    adhar_photo_back = models.ImageField(
+        upload_to='images/',
+    )
+
+
+    #if adhar verified or not
+    is_adhar_verified = models.BooleanField(
+        default=False
+    )
 
     #auto fields -> to be calculated
     live_jobs_count = models.PositiveIntegerField(default=0)
