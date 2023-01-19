@@ -1,6 +1,5 @@
-from django.urls import path
 from api import views
-
+from django.urls import path
 
 urlpatterns = [
     path('terms/', views.TermAndConditionAPI.as_view()),
@@ -14,7 +13,7 @@ urlpatterns = [
     path('login/', views.LoginAPI.as_view()),
     path('refresh-token/', views.RefreshTokenView.as_view()),
     path('profile/', views.ProfileAPI.as_view()),
-    path('password/', views.PasswordAPI.as_view()),
+    path('forget-password/', views.ForgetPasswordAPI.as_view()),
     path('register/', views.RegistrationView.as_view()),
     path('otp/', views.OTPView.as_view()),
     path('email-verify/', views.EmailVerify.as_view()),

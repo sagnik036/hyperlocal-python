@@ -63,9 +63,10 @@ class PaymentTermAdmin(OneObjectAdmin):
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         ('Credentials', {'fields': ('mobile_number','email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name','profile_pic')}),
+        ('Personal info', {'fields': ('first_name', 'last_name','profile_pic','adhar_photo_front','adhar_photo_back')}),
+        
         ('Permissions', {
-            'fields': ('is_active', 'is_superuser'),
+            'fields': ('is_active', 'is_superuser','is_adhar_verified'),
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
@@ -75,8 +76,9 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('mobile_number','email','password1', 'password2'),
         }),
     )
-    list_display = ('mobile_number','first_name', 'last_name', 'is_active','user_type')
-    list_filter = ('is_superuser', 'is_active','user_type')
+    list_display = ('mobile_number','first_name', 'last_name', \
+                    'is_active','user_type','is_shop','is_adhar_verified')
+    list_filter = ('is_superuser', 'is_active','user_type','is_adhar_verified','is_shop')
     search_fields = ('first_name', 'last_name', 'mobile_number')
     ordering = ('first_name',)
 
