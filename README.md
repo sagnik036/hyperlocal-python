@@ -6,7 +6,8 @@ A Proprietor to person delivery app
   - login
     - User Login api, (user can login to the platform using this)
     - Using MobileNumber(as a username) and password
+    - otp based login is also allowed
   - registration
     - User can signup to the platform
     - User can only signup if mobile number gets verified using the otp
-    - Email can also be verified but it will be after signup gets completed
+    - Email can also be verified if user wants to provide the email
