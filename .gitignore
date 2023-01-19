@@ -4,4 +4,4 @@ media/
 .vscode/
 .idea/
 venv
-env
+.env
