@@ -116,20 +116,26 @@ class CustomUser(AbstractUser):
     )
 
     #if user has shop
-    is_shop = models.BooleanField(default=False)
+    is_shop = models.BooleanField(
+        default=False,
+        verbose_name="have shop"
+    )
     
     #adharcard photo
     adhar_photo_front = models.ImageField(
         upload_to='images/',
+        verbose_name= "Adharcard front"
     )
     adhar_photo_back = models.ImageField(
         upload_to='images/',
+        verbose_name="Adharcard Back"
     )
 
 
     #if adhar verified or not
     is_adhar_verified = models.BooleanField(
-        default=False
+        default=False,
+        verbose_name="AdharCard Verified"
     )
 
     #auto fields -> to be calculated
