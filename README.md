@@ -11,3 +11,5 @@ A Proprietor to person delivery app
     - User can signup to the platform
     - User can only signup if mobile number gets verified using the otp
     - Email can also be verified if user wants to provide the email
+- profile
+    - User can also forget the password using otp 
