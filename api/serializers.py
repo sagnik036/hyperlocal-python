@@ -117,6 +117,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'mobile_number',
             'user_type',
             'is_shop',
+            'is_adhar_verified',
+            'adhar_photo_front',
+            'adhar_photo_back',
             'live_jobs_count',
             'total_jobs_posted',
             'is_email_verified',
@@ -129,6 +132,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'date_joined',
+            'is_adhar_verified',
             'last_login',
             'is_superuser',
         )

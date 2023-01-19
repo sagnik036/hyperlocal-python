@@ -534,8 +534,9 @@ class OTPView(CustomAPIView):
         to send OTP
         """
         otp = create_otp(6)
+        mobile = '+'+request.GET.get('mobile_number')
         payload = {
-            'mobile_number': '+'+request.data['mobile_number'],
+            'mobile_number': mobile,
             'otp': otp,
             'exp': int((timezone.now() + timezone.timedelta(minutes=5)).timestamp())
         }
@@ -545,7 +546,7 @@ class OTPView(CustomAPIView):
         
         #implement the tulio otp sending option
         message = OTP_SENDING_TEXT.format(otp)
-        send_transactional_sms(request.data['mobile_number'], message)
+        send_transactional_sms(mobile, message)
         return success_response(message=CODE_SENT, data={'token': token})
 
     # @transaction.atomic
