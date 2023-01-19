@@ -222,3 +222,52 @@ class FrequentlyAskedQuestion(BaseModel):
 
     class Meta:
         ordering = ('-created_at',)
+
+
+"""M2 models"""
+
+class ProprietorShop(BaseModel):
+    user = models.OneToOneField(
+        CustomUser,
+        on_delete=models.CASCADE,
+        verbose_name="Proprietor"
+    )
+    shop_name = models.CharField(
+        max_length=150,
+        blank=False,
+        null=False,
+        verbose_name="Shop Name"
+    )
+    shop_shortdescribtion = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name= "Short Describtion"
+    )
+    shop_describtion = models.CharField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name= "Describtion"
+    )
+    shop_address = models.TextField(
+        max_length=500,
+        verbose_name="Shop Address"
+    )
+    shop_gst = models.CharField(
+        max_length=15,
+        verbose_name="GST NUMBER"
+    )
+    long = models.DecimalField(
+        max_digits=9, 
+        decimal_places=6
+    )
+    lat  = models.DecimalField(
+        max_digits=9, 
+        decimal_places=6
+    )
+
+    #todo we should make this false once we decide this feature
+    is_active = models.BooleanField(
+        default= True
+    )
