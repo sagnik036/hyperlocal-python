@@ -27,6 +27,7 @@ A Proprietor to person delivery app
             3. 4 wheeler
             4. other 
   - Proprietor
+   - Admin Panle
     - If has shop
       - Fields
           - Shop Name
@@ -34,5 +35,7 @@ A Proprietor to person delivery app
           - Shop Type (Charracter Field)
           - Shop Description
           - Shop GST NO.
+          - Shop Location
+          - note we have used GeoDjango for all the location related things in the models and OpenStreetView data for the map
     - If has no shop
           - can proceed towards the dashboard
