@@ -27,15 +27,15 @@ A Proprietor to person delivery app
             3. 4 wheeler
             4. other 
   - Proprietor
-   - Admin Panle
-    - If has shop
-      - Fields
-          - Shop Name
-          - Shop Photo (max 3) (not at initial registration)
-          - Shop Type (Charracter Field)
-          - Shop Description
-          - Shop GST NO.
-          - Shop Location
-          - note we have used GeoDjango for all the location related things in the models and OpenStreetView data for the map
-    - If has no shop
-          - can proceed towards the dashboard
+    - Admin Panel
+      - If has shop
+        - Fields
+            - Shop Name
+            - Shop Photo (max 3) (not at initial registration)
+            - Shop Type (Charracter Field)
+            - Shop Description
+            - Shop GST NO.
+            - Shop Location
+            - note we have used GeoDjango for all the location related things in the models and OpenStreetView data for the map
+      - If has no shop
+            - can proceed towards the dashboard
