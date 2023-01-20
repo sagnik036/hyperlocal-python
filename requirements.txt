@@ -95,3 +95,5 @@ wrapt==1.14.1
 zipp==3.11.0
 cloudinary
 django-cloudinary-storage
+djangorestframework-gis
+django-leaflet
