@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
-
+from django.contrib.gis.admin import OSMGeoAdmin
 from api.forms import ( PaymentTermForm,
                        PrivacyPolicyForm, TermForm, AdminNotificationForm)
 from api.models import (AdminContact, AdminNotification, CustomUser,
@@ -120,8 +120,6 @@ class CustomUserAdmin(UserAdmin):
 #         }))
 
 @admin.register(ProprietorShop)
-class ProprietorShopAdmin(admin.ModelAdmin):
-    list_display = ('user','shop_name','is_active')
-    list_filter = ('user','is_active')
-
+class ProprietorShopAdmin(OSMGeoAdmin):
+    list_display = ('user','location')
 

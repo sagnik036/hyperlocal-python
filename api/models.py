@@ -3,12 +3,16 @@ import uuid
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
-from django.db import models
+# from django.db import models
 from django.core.validators import FileExtensionValidator
 from base.choices import DeviceType, NotificationType, UserType
 from base.utils import StaticFileStorage
+from django.contrib.gis.geos import Point
 from base.base_upload_handlers import handle_tnc_document, handle_privacy_policy_document, handle_images, handle_payment_term_document, handle_legal_doccuments
 from strings import *
+from django.db import models
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
 
 
 class BaseModel(models.Model):
@@ -262,19 +266,7 @@ class ProprietorShop(BaseModel):
         max_length=15,
         verbose_name="GST NUMBER"
     )
-    long = models.DecimalField(
-        max_digits=9, 
-        decimal_places=6,
-        null= True,
-        blank=True
-    )
-    lat  = models.DecimalField(
-        max_digits=9, 
-        decimal_places=6,
-        null= True,
-        blank=True
-    )
-
+    location = PointField()
     #todo we should make this false once we decide this feature
     is_active = models.BooleanField(
         default= True
