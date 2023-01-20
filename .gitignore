@@ -4,4 +4,5 @@ media/
 .vscode/
 .idea/
 venv
+data.json
 .env

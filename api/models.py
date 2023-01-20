@@ -230,6 +230,10 @@ class ProprietorShop(BaseModel):
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
+        limit_choices_to= {
+            'user_type' : UserType.a.value[0],
+            'is_active'  : True
+        },
         verbose_name="Proprietor"
     )
     shop_name = models.CharField(
@@ -244,7 +248,7 @@ class ProprietorShop(BaseModel):
         null=True,
         verbose_name= "Short Describtion"
     )
-    shop_describtion = models.CharField(
+    shop_describtion = models.TextField(
         max_length=500,
         blank=True,
         null=True,
@@ -260,14 +264,21 @@ class ProprietorShop(BaseModel):
     )
     long = models.DecimalField(
         max_digits=9, 
-        decimal_places=6
+        decimal_places=6,
+        null= True,
+        blank=True
     )
     lat  = models.DecimalField(
         max_digits=9, 
-        decimal_places=6
+        decimal_places=6,
+        null= True,
+        blank=True
     )
 
     #todo we should make this false once we decide this feature
     is_active = models.BooleanField(
         default= True
     )
+
+    def __str__(self):
+        return self.user.first_name
