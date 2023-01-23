@@ -3,12 +3,16 @@ import uuid
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
-from django.db import models
+# from django.db import models
 from django.core.validators import FileExtensionValidator
 from base.choices import DeviceType, NotificationType, UserType
 from base.utils import StaticFileStorage
+from django.contrib.gis.geos import Point
 from base.base_upload_handlers import handle_tnc_document, handle_privacy_policy_document, handle_images, handle_payment_term_document, handle_legal_doccuments
 from strings import *
+from django.db import models
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
 
 
 class BaseModel(models.Model):
@@ -222,3 +226,51 @@ class FrequentlyAskedQuestion(BaseModel):
 
     class Meta:
         ordering = ('-created_at',)
+
+
+"""M2 models"""
+
+class ProprietorShop(BaseModel):
+    user = models.OneToOneField(
+        CustomUser,
+        on_delete=models.CASCADE,
+        limit_choices_to= {
+            'user_type' : UserType.a.value[0],
+            'is_active'  : True
+        },
+        verbose_name="Proprietor"
+    )
+    shop_name = models.CharField(
+        max_length=150,
+        blank=False,
+        null=False,
+        verbose_name="Shop Name"
+    )
+    shop_shortdescribtion = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name= "Short Describtion"
+    )
+    shop_describtion = models.TextField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name= "Describtion"
+    )
+    shop_address = models.TextField(
+        max_length=500,
+        verbose_name="Shop Address"
+    )
+    shop_gst = models.CharField(
+        max_length=15,
+        verbose_name="GST NUMBER"
+    )
+    location = PointField()
+    #todo we should make this false once we decide this feature
+    is_active = models.BooleanField(
+        default= True
+    )
+
+    def __str__(self):
+        return self.user.first_name
