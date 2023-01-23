@@ -1,6 +1,6 @@
 # hyperlocal-python
 A Proprietor to person delivery app
-# features that will be implemented in m1
+# features that was be implemented in m1
 - authentication
   - login
     - User Login api, (user can login to the platform using this)
