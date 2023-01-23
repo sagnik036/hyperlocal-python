@@ -5,7 +5,7 @@ from django.contrib.gis.admin import OSMGeoAdmin
 from api.forms import ( PaymentTermForm,
                        PrivacyPolicyForm, TermForm, AdminNotificationForm)
 from api.models import (AdminContact, AdminNotification, CustomUser,
-                        PaymentTerm, PrivacyPolicy, ProprietorShop, \
+                        PaymentTerm, PrivacyPolicy, \
                     TermAndCondition,FrequentlyAskedQuestion,
 )
 
