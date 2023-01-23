@@ -119,7 +119,3 @@ class CustomUserAdmin(UserAdmin):
 #             'admin_notification_id': str(obj.id)
 #         }))
 
-@admin.register(ProprietorShop)
-class ProprietorShopAdmin(OSMGeoAdmin):
-    list_display = ('user','location')
-
