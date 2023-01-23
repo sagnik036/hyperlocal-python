@@ -288,7 +288,6 @@ class ForgetPasswordAPI(CustomAPIView):
                 raise CustomException(INVALID_CODE)
         
         mobile = phonenumber_validator('+'+request.data['mobile_number'])
-        print(mobile)
         if not (otp_payload['mobile_number'] == mobile):
                 raise CustomException(MOBILE_INVALID)
         if otp_payload['exp'] < timezone.now().timestamp():
@@ -447,7 +446,7 @@ class LoginAPI(CustomAPIView):
                 settings.ENV == 'development' and request.data['otp'] == '111111')):
                 raise CustomException(INVALID_CODE)
             if not (otp_payload['mobile_number'] == mobile):
-                raise CustomException(INVALID_CODE)
+                raise CustomException(MOBILE_INVALID)
             
             username = otp_payload['mobile_number']
             user = CustomUser.objects.get_by_natural_key(username)
