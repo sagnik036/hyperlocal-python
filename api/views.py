@@ -30,7 +30,8 @@ from base.base_views import (CustomAPIView, CustomCreateModelMixin,
 from base.choices import NotificationType
 from api.models import (AdminContact, CustomUser, DeviceToken, PaymentTerm,
                         PrivacyPolicy, TermAndCondition, UserNotification,FrequentlyAskedQuestion)
-from base.utils import (CustomException, error_response, success_response, create_otp)
+from base.utils import (CustomException, error_response, \
+                        success_response, create_otp,phonenumber_validator)
 from api.serializers import (AdminContactSerializer, CustomUserSerializer,
                              DeviceTokenSerializer, TextSerializer,
                              UserNotificationSerializer,FrequentlyAskedQuestionSerializer,
@@ -275,6 +276,7 @@ class ForgetPasswordAPI(CustomAPIView):
     #     return error_response(message=EMAIL_NOT_EXISTS)
 
     def post(self, request):
+
         """this is just decoding the otp and mobile number and verifying it"""
         otp_payload = TokenBackend(
             settings.SIMPLE_JWT['ALGORITHM'],
@@ -284,8 +286,10 @@ class ForgetPasswordAPI(CustomAPIView):
         if not (otp_payload['otp'] == request.data['otp'] or (
             settings.ENV == 'development' and request.data['otp'] == '111111')):
                 raise CustomException(INVALID_CODE)
-        if not (otp_payload['mobile_number'] == request.data['mobile_number']):
-                raise CustomException(INVALID_CODE)
+        
+        mobile = phonenumber_validator('+'+request.data['mobile_number'])
+        if not (otp_payload['mobile_number'] == mobile):
+                raise CustomException(MOBILE_INVALID)
         if otp_payload['exp'] < timezone.now().timestamp():
             raise CustomException(EXPIRED_LINK)
 
@@ -426,10 +430,11 @@ class LoginAPI(CustomAPIView):
 
     def post(self, request):
         user = None
+        mobile = phonenumber_validator('+'+request.data['mobile_number'])
         if 'otp' not in request.data or not request.data['otp']:
             user = authenticate(
                 request,
-                username=request.data['mobile_number'],
+                username=mobile,
                 password=request.data['password']
             )
         else:
@@ -440,8 +445,8 @@ class LoginAPI(CustomAPIView):
             if not (otp_payload['otp'] == request.data['otp'] or (
                 settings.ENV == 'development' and request.data['otp'] == '111111')):
                 raise CustomException(INVALID_CODE)
-            if not (otp_payload['mobile_number'] == request.data['mobile_number']):
-                raise CustomException(INVALID_CODE)
+            if not (otp_payload['mobile_number'] == mobile):
+                raise CustomException(MOBILE_INVALID)
             
             username = otp_payload['mobile_number']
             user = CustomUser.objects.get_by_natural_key(username)
@@ -468,8 +473,9 @@ class RegistrationView(CustomAPIView):
         if not (otp_payload['otp'] == request.data['otp'] or (
                 settings.ENV == 'development' and request.data['otp'] == '111111')):
             raise CustomException(INVALID_CODE)
+
         if not (otp_payload['mobile_number'] == request.data['mobile_number']):
-            raise CustomException(INVALID_CODE)
+            raise CustomException(MOBILE_INVALID)
         
         serializer = CustomUserSerializer(data=request.data, context={'request': request, 'view': self})
         serializer.is_valid(raise_exception=True)
@@ -532,7 +538,8 @@ class OTPView(CustomAPIView):
         to send OTP
         """
         otp = create_otp(6)
-        mobile = '+'+request.GET.get('mobile_number')
+        mobile = '+'+ request.GET.get('mobile_number')
+        mobile = phonenumber_validator(mobile)
         payload = {
             'mobile_number': mobile,
             'otp': otp,
@@ -620,3 +627,7 @@ class UserList(CustomAPIView, BaseListView):
             ],
             'pagination': {'more': context['page_obj'].has_next()},
         })
+    
+
+""" m2 api -----------> """
+
