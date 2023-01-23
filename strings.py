@@ -1,4 +1,5 @@
 """ for defining all our custom messages""" 
+MOBILE_INVALID = "Invalid mobile number"
 INVALID_LINK = 'Invalid token or link'
 EXPIRED_LINK = 'Link has been expired.'
 UPDATE_SUCCESS = 'Updated successfully'
