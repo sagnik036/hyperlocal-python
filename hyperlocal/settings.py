@@ -235,6 +235,37 @@ API_URL = os.getenv('API_URL')
 LOGGING_CONFIG = None
 LOGLEVEL = os.environ.get('LOGLEVEL', 'INFO').upper()
 
+# logging.config.dictConfig({
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'default': {
+#             '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+#             'format': '%(asctime)s - %(module)s.%(funcName)s - %(name)s - %(levelname)s - %(message)s - %(exc_text)s'
+#         },
+#         'django.server': DEFAULT_LOGGING['formatters']['django.server'],
+#     },
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'default',
+#         },
+#         'django.server': DEFAULT_LOGGING['handlers']['django.server'],
+#     },
+#     'loggers': {
+#         '': {
+#             'level': LOGLEVEL,
+#             'handlers': ['console'],
+#         },
+#         'django.db.backends': {
+#             'level': 'INFO',
+#             'handlers': ['console'],
+#             'propagate': False
+#         },
+#         # Default runserver request logging
+#         'django.server': DEFAULT_LOGGING['loggers']['django.server'],
+#     },
+# })
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
@@ -250,22 +281,29 @@ logging.config.dictConfig({
             'class': 'logging.StreamHandler',
             'formatter': 'default',
         },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logs',
+            'formatter': 'default',
+        },
         'django.server': DEFAULT_LOGGING['handlers']['django.server'],
     },
     'loggers': {
         '': {
             'level': LOGLEVEL,
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
         },
         'django.db.backends': {
             'level': 'INFO',
             'handlers': ['console'],
             'propagate': False
         },
-        # Default runserver request logging
         'django.server': DEFAULT_LOGGING['loggers']['django.server'],
     },
 })
+
+
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=364),  # TODO: update for production
