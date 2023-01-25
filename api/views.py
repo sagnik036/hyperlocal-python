@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.views import View
 from django.db.models import F
 from django.views.generic.list import BaseListView
+import logging
 
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -43,6 +44,8 @@ from strings import *
 
 
 from base.utils import get_jwt_auth_token
+logger = logging.getLogger(__file__)
+
 
 class TermAndConditionAPI(CustomAPIView):
     def initial(self, request, *args, **kwargs):
