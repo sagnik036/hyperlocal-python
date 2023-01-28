@@ -12,3 +12,12 @@ class IsEmailNotVerified(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.is_authenticated and not request.user.is_email_verified
+
+
+"""m2 permissions --> """
+
+class IsShopOwnerIsNot(BasePermission):
+    message = NOTSHOPOWNER
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.is_shop

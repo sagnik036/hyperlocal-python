@@ -1,5 +1,7 @@
 from api import views
-from django.urls import path
+from django.urls import path,re_path
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_http_methods
 
 urlpatterns = [
     path('terms/', views.TermAndConditionAPI.as_view()),
@@ -21,4 +23,7 @@ urlpatterns = [
     path('frequently-asked-question/', views.FrequentlyAskedQuestionList.as_view()),
     path('frequently-asked-question/<str:pk>/', views.FrequentlyAskedQuestionDetail.as_view()),
     path('users/', views.UserList.as_view(), name='users'),
+    #m2 urls --->
+    path('registerShop/',views.ShopBaseView.as_view()),
+    path('shopdata/',views.ShopListView.as_view())
 ]

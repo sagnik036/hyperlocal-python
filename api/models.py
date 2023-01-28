@@ -103,7 +103,6 @@ class CustomUser(AbstractUser):
         error_messages={"unique": "A user with that email already exists"},
         null= True,
         blank= True,
-        unique= True
     )
     mobile_number = models.CharField(
         error_messages={"unique": "A user with that mobile already exists"},
@@ -266,7 +265,12 @@ class ProprietorShop(BaseModel):
         max_length=15,
         verbose_name="GST NUMBER"
     )
-    location = PointField()
+    location = PointField(
+        geography=True,
+        null=True,
+        blank=True
+    )
+    
     #todo we should make this false once we decide this feature
     is_active = models.BooleanField(
         default= True

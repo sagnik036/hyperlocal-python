@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'cloudinary',
     
     'rest_framework',
+    'leaflet',
     'corsheaders',
     'django_filters',
     'ckeditor',
