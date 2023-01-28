@@ -15,7 +15,8 @@ A Proprietor to person delivery app
     - Email can also be verified but it will be after signup gets completed
 
 # features that will be implemented in m2
-- Shop Add and Vehicle add api
+- Shop Add/List and Vehicle add/list api/admin-panel
+
   - Delivery Person
     - Delivery person can add their vehicle
     - Fields - 
@@ -25,9 +26,11 @@ A Proprietor to person delivery app
             1. 2 wheeler
             2. 3 wheeler
             3. 4 wheeler
-            4. other 
+            4. other
+    - We can list the vehcile data
+
   - Proprietor
-    - Admin Panel
+    - Admin Panel/Api(shop add, shop list)
       - If has shop
         - Fields
             - Shop Name
@@ -36,6 +39,8 @@ A Proprietor to person delivery app
             - Shop Description
             - Shop GST NO.
             - Shop Location
-            - note we have used GeoDjango for all the location related things in the models and OpenStreetView data for the map
+            - note we have used GeoDjango for all the location related things in the models and OpenStreetView data for the ma
+        - Can also list the shop using the api
       - If has no shop
             - can proceed towards the dashboard
+
