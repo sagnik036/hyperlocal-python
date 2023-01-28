@@ -4,8 +4,9 @@ from django.contrib.auth.hashers import make_password
 from django.http import QueryDict
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-
-from api.models import AdminContact, CustomUser, DeviceToken, UserNotification,FrequentlyAskedQuestion
+from django.contrib.gis.geos import Point
+from api.models import (AdminContact, CustomUser, DeviceToken, \
+    UserNotification,FrequentlyAskedQuestion,ProprietorShop)
 from base.utils import get_image_from_b64, phonenumber_validator, custom_password_validator
 from strings import *
 
@@ -126,10 +127,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'is_mobile_verified',
             'profile_pic',
             'is_superuser',
-            'last_login',
-             
-            
+            'last_login',   
         )
+
         read_only_fields = (
             'date_joined',
             'is_adhar_verified',
@@ -168,3 +168,29 @@ class FrequentlyAskedQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = FrequentlyAskedQuestion
         fields = ("id", "created_at", "modified_at", "question", "answer")
+
+
+""" m2 serializers  --> """
+class ShopRegistrationSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = ProprietorShop
+        fields = (
+            "id",
+            "shop_name",
+            "shop_shortdescribtion",
+            "shop_describtion",
+            "shop_address",
+            "shop_gst",
+            "location",
+        )
+
+    def create(self, validated_data):
+        longitude,latitude = validated_data['location'].split(',')
+        validated_data.update(
+            user = self.context['request'].user,
+            location = Point(
+                float(longitude),
+                float(latitude)
+            )
+        )
+        return super().create(validated_data)

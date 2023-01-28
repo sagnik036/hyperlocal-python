@@ -13,6 +13,7 @@ from api.models import (AdminContact, AdminNotification, CustomUser,
 from api.task import send_notification_to_users
 from django.db import transaction
 from base.choices import NotificationType
+from leaflet.admin import LeafletGeoAdmin
 
 admin.site.site_header = 'HYPERLOCAL-ADMIN'
 admin.site.site_url = None
@@ -120,6 +121,6 @@ class CustomUserAdmin(UserAdmin):
 #         }))
 
 @admin.register(ProprietorShop)
-class ProprietorShopAdmin(OSMGeoAdmin):
+class ProprietorShopAdmin(LeafletGeoAdmin):
     list_display = ('user','location')
 

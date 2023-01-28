@@ -23,20 +23,21 @@ from rest_framework_simplejwt.backends import TokenBackend, TokenBackendError
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
-from base.base_permissions import IsSuperUser, IsEmailNotVerified
+from base.base_permissions import IsSuperUser, IsEmailNotVerified, IsShopOwnerIsNot
 from base.base_views import (CustomAPIView, CustomCreateModelMixin,
                              CustomDestroyModelMixin, CustomGenericView,
                              CustomListModelMixin, CustomRetrieveModelMixin,
                              CustomUpdateModelMixin)
 from base.choices import NotificationType
-from api.models import (AdminContact, CustomUser, DeviceToken, PaymentTerm,
-                        PrivacyPolicy, TermAndCondition, UserNotification,FrequentlyAskedQuestion)
+from api.models import (AdminContact, CustomUser, DeviceToken, PaymentTerm,\
+                        PrivacyPolicy, TermAndCondition, UserNotification,\
+                        FrequentlyAskedQuestion, ProprietorShop)
 from base.utils import (CustomException, error_response, \
                         success_response, create_otp,phonenumber_validator)
 from api.serializers import (AdminContactSerializer, CustomUserSerializer,
                              DeviceTokenSerializer, TextSerializer,
                              UserNotificationSerializer,FrequentlyAskedQuestionSerializer,
-                             UserPasswordSerializer)
+                             UserPasswordSerializer,ShopRegistrationSerializers)
 
 from api.task import send_mail_task, send_notification_to_users, send_transactional_sms
 from strings import *
@@ -634,3 +635,31 @@ class UserList(CustomAPIView, BaseListView):
 
 """ m2 api -----------> """
 
+"""base view of shop here we can also register the shop"""
+class ShopBaseView(CustomGenericView,CustomCreateModelMixin):
+    permission_classes = (IsShopOwnerIsNot,)
+    queryset = ProprietorShop.objects.all()
+    serializer_class = ShopRegistrationSerializers
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+"""here we can list the shop data"""
+class ShopListView(ShopBaseView,CustomAPIView):
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            user = self.request.user
+        )
+    
+    def get(self, request):
+        serializers = ShopRegistrationSerializers(
+            instance=self.get_queryset().first(),
+            context={
+                'request': request
+            }
+        )
+        return success_response(
+            data = serializers.data,
+            message="SUCCESS"
+        )

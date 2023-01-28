@@ -55,5 +55,6 @@ DEFAULT_CLAUSES_TEXT = 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ip
                        ' Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum' \
                        ' Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum'
 
-
+"""m2 messages --> """
+NOTSHOPOWNER = "You are not a shop owner"
 
