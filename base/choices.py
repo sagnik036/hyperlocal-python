@@ -25,8 +25,14 @@ class DeviceType(ChoiceEnum):
 
 
 class UserType(ChoiceEnum):
-    a = ("1","proprieter")
-    b = ("2","deliveryperson")
+    a = ("1","PROPRIETOR")
+    b = ("2","DELIVERYPERSON")
+
+class VehicleType(ChoiceEnum):
+    a = ("1","TWO-WHEELER")
+    b = ("2","THREE-WHEELER")
+    c = ("3","FOUR-WHEELER")
+    d = ("4","OTHER")
 
 
 

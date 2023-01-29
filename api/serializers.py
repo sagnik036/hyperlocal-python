@@ -181,16 +181,53 @@ class ShopRegistrationSerializers(serializers.ModelSerializer):
             "shop_describtion",
             "shop_address",
             "shop_gst",
-            "location",
+            "location"
+        )
+        read_only_fields = (
+            "id",
+            "shop_name",
+            "shop_shortdescribtion",
+            "shop_describtion",
+            "shop_address",
+            "shop_gst",
+            "location"
         )
 
+    """this is checking for the validation **note this is important"""
+
+    def validate(self, data):
+        user_id = self.context.get('user_id')
+
+        if ProprietorShop.objects.filter(
+                    user_id = user_id,
+                    is_active=True
+                ).exists() and self.instance is None:
+                raise serializers.ValidationError({"user":SHOPALREADYEXIST})
+        
+        elif ProprietorShop.objects.filter(
+                user_id = user_id,
+                is_active = True,
+                is_job_live = True
+            ).exists() and self.instance is not None:
+            raise serializers.ValidationError({"user" : CANNOTPERFORM})
+        
+        return data
+    
     def create(self, validated_data):
         longitude,latitude = validated_data['location'].split(',')
         validated_data.update(
-            user = self.context['request'].user,
+            user_id = self.context.get('user_id'),
             location = Point(
                 float(longitude),
                 float(latitude)
             )
         )
         return super().create(validated_data)
+    
+    # def update(self, instance, validated_data):
+    #     validated_data.update(
+    #         is_active = False
+    #     )
+    #     return super().update(instance, validated_data)
+    
+        

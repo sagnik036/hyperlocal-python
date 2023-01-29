@@ -8,11 +8,12 @@ from api.models import (AdminContact, AdminNotification, CustomUser,
                         PaymentTerm, PrivacyPolicy, ProprietorShop, \
                     TermAndCondition,FrequentlyAskedQuestion,
 )
-
+from django.core.exceptions import ValidationError
 
 from api.task import send_notification_to_users
 from django.db import transaction
 from base.choices import NotificationType
+from django.contrib import messages
 from leaflet.admin import LeafletGeoAdmin
 
 admin.site.site_header = 'HYPERLOCAL-ADMIN'
@@ -123,4 +124,7 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(ProprietorShop)
 class ProprietorShopAdmin(LeafletGeoAdmin):
     list_display = ('user','location')
-
+    
+    #todo please make this False after the testing or in final phase of testing
+    def has_delete_permission(self,request,obj=None):
+        return True

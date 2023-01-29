@@ -57,4 +57,8 @@ DEFAULT_CLAUSES_TEXT = 'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ip
 
 """m2 messages --> """
 NOTSHOPOWNER = "You are not a shop owner"
+SHOPALREADYEXIST = "You already have a shop live"
+VEHICLEALREADYHAVE = "You already have a active vehicle"
+CANNOTPERFORM = "You can not perform this action when when your job is live"
+
 

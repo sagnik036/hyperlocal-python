@@ -1,7 +1,7 @@
 from django import forms
 
 from api.models import (AdminNotification, CustomUser, PaymentTerm,
-                        PrivacyPolicy, TermAndCondition)
+                        PrivacyPolicy, TermAndCondition,ProprietorShop)
 from api.task import send_notification_to_users
 from base.choices import NotificationType
 from base.utils import get_boolean
@@ -119,3 +119,25 @@ class AdminNotificationForm(forms.ModelForm):
                 qs = AdminNotification.recipients.through.objects.filter(
                     adminnotification_id=self.instance.id).values_list('customuser_id', flat=True)
                 self.fields['recipients'].queryset = CustomUser.objects.filter(id__in=qs)
+
+# class ProprietorShopAdminForm(forms.ModelForm):
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         user = cleaned_data.get("user")
+#         if self.instance.id:
+#             print(self.instance.id)
+#             if ProprietorShop.objects.filter(
+#                     user_id=user.id,
+#                     is_active=True,
+#                     is_job_live = True
+#                 ).exists():
+#                 self.add_error('is_job_live',CANNOTPERFORM)
+#         else:
+#             print("s")
+#             if ProprietorShop.objects.filter(
+#                     user_id=user.id,
+#                     is_active=True,
+#                 ).exists():
+#                 self.add_error('user',SHOPALREADYEXIST)
+            
+    
