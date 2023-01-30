@@ -637,27 +637,15 @@ class UserList(CustomAPIView, BaseListView):
 """ m2 api -----------> """
 
 """base view of shop here we can also register the shop"""
-class ShopBaseView(CustomGenericView):
+class ShopBaseView(CustomGenericView,CustomCreateModelMixin):
     permission_classes = (IsShopOwnerIsNot,)
     queryset = ProprietorShop.objects.all()
     serializer_class = ShopRegistrationSerializers
     
     @transaction.atomic
-    def post(self, request):
-        user_id = request.user.id
-        serializers = ShopRegistrationSerializers(
-            data = request.data,
-            context ={
-                'user_id' : user_id
-            }
-        )
-        serializers.is_valid(raise_exception=True)
-        serializers.save()
-        return success_response(
-            data=serializers.data,
-            message="CREATE SUCCESS"
-        )
-    
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
 """here we can list the shop data"""
 class ShopDetailView(ShopBaseView,CustomAPIView,CustomUpdateModelMixin,CustomDestroyModelMixin):
     def get_queryset(self):

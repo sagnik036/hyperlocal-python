@@ -285,24 +285,23 @@ class ProprietorShop(BaseModel):
     def __str__(self):
         return self.shop_name
 
-
-    #todo to implement this feature in the api as well in the admin panel
-    # def clean(self):
-    #     if self.created_at:
-    #         if ProprietorShop.objects.filter(
-    #                 user_id=self.user_id, 
-    #                 is_active=True,
-    #                 is_job_live = True
-    #             ).exists():
-    #             raise ValidationError({'user': CANNOTPERFORM})
-    #     elif not self.created_at:
-    #         if ProprietorShop.objects.filter(
-    #                     user_id=self.user_id, 
-    #                     is_active=True,
-    #                 ).exists():
-    #             raise ValidationError({'user': SHOPALREADYEXIST})
     
 
+    #todo to implement this feature in the api as well in the admin panel
+    def clean(self):
+        if self.created_at:
+            if ProprietorShop.objects.filter(
+                    user_id=self.user_id, 
+                    is_active=True,
+                    is_job_live = True
+                ).exists():
+                raise ValidationError(CANNOTPERFORM)
+        elif not self.created_at:
+            if ProprietorShop.objects.filter(
+                        user_id=self.user_id, 
+                        is_active=True,
+                    ).exists():
+                raise ValidationError(SHOPALREADYEXIST)
     
     
 class VehicleDeliveryPerson(BaseModel):

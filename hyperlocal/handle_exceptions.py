@@ -68,7 +68,8 @@ def custom_exception_handler(exc, context):
         detail = exc.detail
 
     if isinstance(exc, ValidationError):
-        message = exc.message
+        if len(exc.messages):
+            message = exc.messages[0]
 
     if isinstance(exc, CustomException):
         message = exc.__str__()

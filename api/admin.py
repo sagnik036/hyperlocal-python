@@ -124,7 +124,7 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(ProprietorShop)
 class ProprietorShopAdmin(LeafletGeoAdmin):
     list_display = ('user','location')
-    
+
     #todo please make this False after the testing or in final phase of testing
     def has_delete_permission(self,request,obj=None):
         return True
