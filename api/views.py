@@ -690,9 +690,4 @@ class ShopDetailView(ShopBaseView,CustomAPIView,CustomUpdateModelMixin,CustomDes
             message="SUCCESS"
         )
     
-    # def patch(self, request, *args, **kwargs):
-    #     return super().partial_update(request, *args,context={'user_id':request.user.id,'id':kwargs['pk']}, **kwargs)
-        
-    
-    
     

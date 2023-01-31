@@ -183,7 +183,7 @@ class ShopRegistrationSerializers(serializers.ModelSerializer):
             "shop_gst",
             "location"
         )
-        
+
     def create(self, validated_data):
         longitude,latitude = validated_data['location'].split(',')
         validated_data.update(
@@ -196,11 +196,3 @@ class ShopRegistrationSerializers(serializers.ModelSerializer):
         obj = self.Meta.model(**validated_data)
         obj.full_clean()        
         return super().create(validated_data)
-    
-    # def update(self, instance, validated_data):
-    #     validated_data.update(
-    #         is_active = False
-    #     )
-    #     return super().update(instance, validated_data)
-    
-        
