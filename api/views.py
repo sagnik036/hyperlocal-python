@@ -15,7 +15,7 @@ from django.views.generic.list import BaseListView
 import logging
 
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.authentication import AUTH_HEADER_TYPES
@@ -37,7 +37,7 @@ from base.utils import (CustomException, error_response, \
 from api.serializers import (AdminContactSerializer, CustomUserSerializer,
                              DeviceTokenSerializer, TextSerializer,
                              UserNotificationSerializer,FrequentlyAskedQuestionSerializer,
-                             UserPasswordSerializer,ShopRegistrationSerializers)
+                             UserPasswordSerializer,ShopSerializers,ShopListSerializers)
 
 from api.task import send_mail_task, send_notification_to_users, send_transactional_sms
 from strings import *
@@ -637,33 +637,39 @@ class UserList(CustomAPIView, BaseListView):
 """ m2 api -----------> """
 
 """base view of shop here we can also register the shop"""
-class ShopBaseView(CustomGenericView,CustomCreateModelMixin):
-    permission_classes = (IsShopOwnerIsNot,)
+class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin):
+    permission_classes = (IsAuthenticated,)
     queryset = ProprietorShop.objects.all()
-    serializer_class = ShopRegistrationSerializers
+    serializer_class = ShopSerializers
+
+    def initial(self, request, *args, **kwargs):
+        if not request.method == "GET":
+            self.permission_classes = (IsShopOwnerIsNot,)
+        return super().initial(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        #here the list serializers is called
+        self.serializer_class = ShopListSerializers
+        return self.list(request, *args, **kwargs)
     
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-"""here we can list the shop data"""
-class ShopDetailView(ShopBaseView,CustomAPIView,CustomUpdateModelMixin,CustomDestroyModelMixin):
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            user_id = self.request.user.id
-        )
-    
-    def get(self, request):
-        serializers = ShopRegistrationSerializers(
-            instance=self.get_queryset().first(),
-            context={
-                'request': request
-            }
-        )
-        return success_response(
-            data = serializers.data,
-            message="SUCCESS"
-        )
+
+"""here we can retrieve and delete the shop data"""
+class ShopDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroyModelMixin):
+    permission_classes = (IsAuthenticated,)
+    queryset = ProprietorShop.objects.all()
+    serializer_class = ShopSerializers
+
+    def initial(self, request, *args, **kwargs):
+        if not request.method == "GET":
+            self.permission_classes = (IsShopOwnerIsNot,)
+        return super().initial(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
     
     def delete(self, request, *args, **kwargs):
         instance = self.get_queryset().filter(

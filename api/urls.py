@@ -24,7 +24,6 @@ urlpatterns = [
     path('frequently-asked-question/<str:pk>/', views.FrequentlyAskedQuestionDetail.as_view()),
     path('users/', views.UserList.as_view(), name='users'),
     #m2 urls --->
-    path('registerShop/',views.ShopBaseView.as_view()),
-    path('shopdata/',views.ShopDetailView.as_view()),
-    path('delshopdata/<str:pk>/',views.ShopDetailView.as_view())
+    path('shopdata/',views.ShopListView.as_view()),
+    path('shopdata/<str:pk>/',views.ShopDetailView.as_view()),
 ]

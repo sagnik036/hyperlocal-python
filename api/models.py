@@ -240,6 +240,10 @@ class ProprietorShop(BaseModel):
         },
         verbose_name="Proprietor",
     )
+    shop_photo = models.ImageField(
+        upload_to='images/', 
+        blank=True
+    )
     shop_name = models.CharField(
         max_length=150,
         blank=False,
@@ -284,6 +288,9 @@ class ProprietorShop(BaseModel):
 
     def __str__(self):
         return self.shop_name
+    
+    class Meta:
+        ordering = ('-created_at',)
 
     
 
@@ -345,5 +352,8 @@ class VehicleDeliveryPerson(BaseModel):
 
     def __str__(self):
         return self.vehicle_name
+    
+    class Meta:
+        ordering = ('-created_at',)
     
     
