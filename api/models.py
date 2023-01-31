@@ -5,7 +5,8 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 # from django.db import models
 from django.core.validators import FileExtensionValidator
-from base.choices import DeviceType, NotificationType, UserType
+from base.choices import DeviceType, NotificationType,\
+      UserType, VehicleType
 from base.utils import StaticFileStorage
 from django.contrib.gis.geos import Point
 from base.base_upload_handlers import handle_tnc_document, handle_privacy_policy_document, handle_images, handle_payment_term_document, handle_legal_doccuments
@@ -13,6 +14,8 @@ from strings import *
 from django.db import models
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 
 class BaseModel(models.Model):
@@ -162,7 +165,6 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)
 
     def validate_unique(self, exclude=None):
-
         if not self.email.islower():
             self.email = self.email.lower()
         super().validate_unique(exclude=['id'])
@@ -228,16 +230,15 @@ class FrequentlyAskedQuestion(BaseModel):
 
 
 """M2 models"""
-
 class ProprietorShop(BaseModel):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
         limit_choices_to= {
             'user_type' : UserType.a.value[0],
             'is_active'  : True
         },
-        verbose_name="Proprietor"
+        verbose_name="Proprietor",
     )
     shop_name = models.CharField(
         max_length=150,
@@ -263,7 +264,8 @@ class ProprietorShop(BaseModel):
     )
     shop_gst = models.CharField(
         max_length=15,
-        verbose_name="GST NUMBER"
+        verbose_name="GST NUMBER",
+        unique=True
     )
     location = PointField(
         geography=True,
@@ -276,5 +278,72 @@ class ProprietorShop(BaseModel):
         default= True
     )
 
+    is_job_live = models.BooleanField(
+        default=False
+    )
+
     def __str__(self):
-        return self.user.first_name
+        return self.shop_name
+
+    
+
+    #todo to implement this feature in the api as well in the admin panel
+    def clean(self):
+        if self.created_at:
+            if ProprietorShop.objects.filter(
+                    user_id=self.user_id, 
+                    is_active=True,
+                    is_job_live = True
+                ).exists():
+                raise ValidationError(CANNOTPERFORM)
+        elif not self.created_at:
+            if ProprietorShop.objects.filter(
+                        user_id=self.user_id, 
+                        is_active=True,
+                    ).exists():
+                raise ValidationError(SHOPALREADYEXIST)
+    
+    
+class VehicleDeliveryPerson(BaseModel):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        limit_choices_to= {
+            'user_type' : UserType.b.value[0],
+            'is_active'  : True
+        },
+        verbose_name="DELIVERY-PERSON"
+    )
+    vehicle_type = models.CharField(
+        max_length=2,
+        choices=[x.value for x in UserType]
+    )
+    vehicle_number = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    vehicle_name = models.CharField(
+        max_length=20,
+    )
+
+    #todo if possible we can check the vehicle number in future then tick this true \
+    # for now we can have this field default as True
+
+    is_verified = models.BooleanField(
+        default=True
+    )
+
+    #can have the permission to delete the vehicle and add new if we decide to add this in future
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    is_job_live = models.BooleanField(
+        default=False
+    )
+
+    def __str__(self):
+        return self.vehicle_name
+    
+    

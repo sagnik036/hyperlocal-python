@@ -41,6 +41,7 @@ from api.serializers import (AdminContactSerializer, CustomUserSerializer,
 
 from api.task import send_mail_task, send_notification_to_users, send_transactional_sms
 from strings import *
+from rest_framework.validators import ValidationError
 
 
 
@@ -640,16 +641,16 @@ class ShopBaseView(CustomGenericView,CustomCreateModelMixin):
     permission_classes = (IsShopOwnerIsNot,)
     queryset = ProprietorShop.objects.all()
     serializer_class = ShopRegistrationSerializers
-
+    
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
-    
+
 """here we can list the shop data"""
-class ShopListView(ShopBaseView,CustomAPIView):
+class ShopDetailView(ShopBaseView,CustomAPIView,CustomUpdateModelMixin,CustomDestroyModelMixin):
     def get_queryset(self):
         return super().get_queryset().filter(
-            user = self.request.user
+            user_id = self.request.user.id
         )
     
     def get(self, request):
@@ -663,3 +664,30 @@ class ShopListView(ShopBaseView,CustomAPIView):
             data = serializers.data,
             message="SUCCESS"
         )
+    
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_queryset().filter(
+            id = kwargs['pk']
+        ).only(
+            'is_active',
+            'is_job_live'
+        ).first()
+
+        if instance.is_active and instance.is_job_live:
+            raise ValidationError({"user":CANNOTPERFORM})
+        elif instance.is_active == False:
+            raise  ValidationError({"user":"SHOP NOT EXISTS"})
+        
+        instance = self.get_queryset().filter(
+            id = kwargs['pk'],
+            is_active = True,
+            is_job_live = False
+        ).update(
+            is_active = False
+        )
+
+        return success_response(
+            message="SUCCESS"
+        )
+    
+    

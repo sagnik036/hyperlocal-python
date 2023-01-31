@@ -181,16 +181,18 @@ class ShopRegistrationSerializers(serializers.ModelSerializer):
             "shop_describtion",
             "shop_address",
             "shop_gst",
-            "location",
+            "location"
         )
 
     def create(self, validated_data):
         longitude,latitude = validated_data['location'].split(',')
         validated_data.update(
-            user = self.context['request'].user,
+            user_id = self.context['request'].user.id,
             location = Point(
                 float(longitude),
                 float(latitude)
             )
         )
+        obj = self.Meta.model(**validated_data)
+        obj.full_clean()        
         return super().create(validated_data)

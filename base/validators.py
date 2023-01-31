@@ -2,6 +2,7 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
+from api.models import ProprietorShop
 
 
 class NumberValidator(object):
@@ -11,3 +12,4 @@ class NumberValidator(object):
 
     def get_help_text(self):
         return _("Your password must contain at least 1 digit.")
+
