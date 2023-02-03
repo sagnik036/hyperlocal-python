@@ -22,6 +22,7 @@ from rest_framework_simplejwt.authentication import AUTH_HEADER_TYPES
 from rest_framework_simplejwt.backends import TokenBackend, TokenBackendError
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_gis.filters import GeoFilterSet
 
 from base.base_permissions import IsSuperUser, IsEmailNotVerified, IsShopOwnerIsNot
 from base.base_views import (CustomAPIView, CustomCreateModelMixin,
@@ -638,13 +639,14 @@ class UserList(CustomAPIView, BaseListView):
 
 """base view of shop here we can also register the shop"""
 class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsShopOwnerIsNot,)
     queryset = ProprietorShop.objects.all()
     serializer_class = ShopSerializers
+    
 
     def initial(self, request, *args, **kwargs):
         if not request.method == "GET":
-            self.permission_classes = (IsShopOwnerIsNot,)
+            self.permission_classes = (IsAuthenticated,)
         return super().initial(request, *args, **kwargs)
     
     def get(self, request, *args, **kwargs):
@@ -659,13 +661,13 @@ class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin
 
 """here we can retrieve and delete the shop data"""
 class ShopDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroyModelMixin):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsShopOwnerIsNot,)
     queryset = ProprietorShop.objects.all()
     serializer_class = ShopSerializers
 
     def initial(self, request, *args, **kwargs):
         if not request.method == "GET":
-            self.permission_classes = (IsShopOwnerIsNot,)
+            self.permission_classes = (IsAuthenticated,)
         return super().initial(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):

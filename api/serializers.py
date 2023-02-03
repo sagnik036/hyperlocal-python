@@ -180,6 +180,7 @@ class ShopListSerializers(serializers.ModelSerializer):
             "shop_name",
             "shop_shortdescribtion",
             "shop_address",
+            "location",
             "is_active"
         )
         read_only_fields =(
@@ -188,6 +189,7 @@ class ShopListSerializers(serializers.ModelSerializer):
             "shop_name",
             "shop_shortdescribtion",
             "shop_address",
+            "location",
             "is_active"
         )
 
