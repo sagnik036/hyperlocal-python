@@ -171,18 +171,55 @@ class FrequentlyAskedQuestionSerializer(serializers.ModelSerializer):
 
 
 """ m2 serializers  --> """
-class ShopRegistrationSerializers(serializers.ModelSerializer):
+class ShopListSerializers(serializers.ModelSerializer):
     class Meta:
         model = ProprietorShop
         fields = (
             "id",
+            "shop_photo",
+            "shop_name",
+            "shop_shortdescribtion",
+            "shop_address",
+            "location",
+            "is_active"
+        )
+        read_only_fields =(
+            "id",
+            "shop_photo",
+            "shop_name",
+            "shop_shortdescribtion",
+            "shop_address",
+            "location",
+            "is_active"
+        )
+
+    
+class ShopSerializers(serializers.ModelSerializer):
+    profile_picture = serializers.SerializerMethodField('get_profile_picture')
+    class Meta:
+        model = ProprietorShop
+        fields = (
+            "id",
+            "profile_picture",
+            "shop_photo",
             "shop_name",
             "shop_shortdescribtion",
             "shop_describtion",
             "shop_address",
             "shop_gst",
+            "is_active",
             "location"
         )
+
+        read_only_fields =(
+            "id",
+            "profile_picture",
+            "is_active"
+        )
+
+    """ this will add an extra field the list serializers"""
+    def get_profile_picture(self,obj):
+        return str(obj.user.profile_pic.url)
 
     def create(self, validated_data):
         longitude,latitude = validated_data['location'].split(',')
