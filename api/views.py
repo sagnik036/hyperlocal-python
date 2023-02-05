@@ -23,6 +23,7 @@ from rest_framework_simplejwt.backends import TokenBackend, TokenBackendError
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_gis.filters import GeoFilterSet
+from rest_framework.filters import SearchFilter
 
 from base.base_permissions import IsSuperUser, IsEmailNotVerified, IsShopOwnerIsNot
 from base.base_views import (CustomAPIView, CustomCreateModelMixin,
@@ -43,8 +44,9 @@ from api.serializers import (AdminContactSerializer, CustomUserSerializer,
 from api.task import send_mail_task, send_notification_to_users, send_transactional_sms
 from strings import *
 from rest_framework.validators import ValidationError
+# from .filters import ShopFilter
 
-
+from django_filters.rest_framework import DjangoFilterBackend
 
 from base.utils import get_jwt_auth_token
 logger = logging.getLogger(__file__)
@@ -642,6 +644,8 @@ class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin
     permission_classes = (IsShopOwnerIsNot,)
     queryset = ProprietorShop.objects.all()
     serializer_class = ShopSerializers
+    filter_backends = [SearchFilter,]
+    search_fields = ('name','user_id',)
     
 
     def initial(self, request, *args, **kwargs):
@@ -649,6 +653,7 @@ class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin
             self.permission_classes = (IsAuthenticated,)
         return super().initial(request, *args, **kwargs)
     
+    """list all the shop details"""
     def get(self, request, *args, **kwargs):
         #here the list serializers is called
         self.serializer_class = ShopListSerializers

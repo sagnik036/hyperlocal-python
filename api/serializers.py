@@ -9,7 +9,7 @@ from api.models import (AdminContact, CustomUser, DeviceToken, \
     UserNotification,FrequentlyAskedQuestion,ProprietorShop)
 from base.utils import get_image_from_b64, phonenumber_validator, custom_password_validator
 from strings import *
-
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 
 class CustomPasswordField(serializers.CharField):
@@ -171,16 +171,37 @@ class FrequentlyAskedQuestionSerializer(serializers.ModelSerializer):
 
 
 """ m2 serializers  --> """
+
+class UserListSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = (
+            "id",
+            'date_joined',
+            'first_name',
+            'last_name',
+            'email',
+            'mobile_number',
+            'total_jobs_posted',
+            'profile_pic',
+        )
+
+
 class ShopListSerializers(serializers.ModelSerializer):
+    user = UserListSerializers(read_only = True)
+
     class Meta:
         model = ProprietorShop
         fields = (
             "id",
+            "user",
             "shop_photo",
             "shop_name",
             "shop_shortdescribtion",
-            "shop_address",
             "location",
+            "shop_address",
+            "shop_country",
+            "shop_state",
             "is_active"
         )
         read_only_fields =(
@@ -188,48 +209,49 @@ class ShopListSerializers(serializers.ModelSerializer):
             "shop_photo",
             "shop_name",
             "shop_shortdescribtion",
-            "shop_address",
             "location",
+            "shop_address",
+            "shop_country",
+            "shop_state",
             "is_active"
         )
 
     
 class ShopSerializers(serializers.ModelSerializer):
-    profile_picture = serializers.SerializerMethodField('get_profile_picture')
+    # profile_picture = serializers.SerializerMethodField('get_profile_picture')
+    user = UserListSerializers(read_only = True)
+
     class Meta:
         model = ProprietorShop
         fields = (
             "id",
-            "profile_picture",
+            "user",
             "shop_photo",
             "shop_name",
             "shop_shortdescribtion",
             "shop_describtion",
-            "shop_address",
             "shop_gst",
             "is_active",
-            "location"
+            "location",
+            "shop_address",
+            "shop_country",
+            "shop_state",
         )
 
         read_only_fields =(
             "id",
-            "profile_picture",
-            "is_active"
+            "is_active",
+            "shop_address",
+            "shop_country",
+            "shop_state",
         )
 
-    """ this will add an extra field the list serializers"""
-    def get_profile_picture(self,obj):
-        return str(obj.user.profile_pic.url)
+    # """ this will add an extra field the list serializers"""
+    # def get_profile_picture(self,obj):
+    #     return str(obj.user.profile_pic.url)
 
     def create(self, validated_data):
-        longitude,latitude = validated_data['location'].split(',')
-        validated_data.update(
-            user_id = self.context['request'].user.id,
-            location = Point(
-                float(longitude),
-                float(latitude)
-            )
-        )
+        validated_data['user'] = self.context['request'].user
         obj = self.Meta.model(**validated_data)
         obj.full_clean()        
         return super().create(validated_data)
