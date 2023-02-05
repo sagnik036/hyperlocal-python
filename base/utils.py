@@ -320,3 +320,9 @@ def get_thumbnail_url(url):
         }
     )
     return thumbnail_url
+
+def get_geo_data(x,y):
+    url = f'https://nominatim.openstreetmap.org/reverse?format=json&lat={y}&lon={x}'
+    response = requests.get(url)
+    data = response.json()
+    return data

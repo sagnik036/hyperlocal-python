@@ -16,6 +16,7 @@ from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from base.utils import get_geo_data
 
 
 class BaseModel(models.Model):
@@ -263,9 +264,24 @@ class ProprietorShop(BaseModel):
         verbose_name= "Describtion"
     )
     shop_address = models.TextField(
-        max_length=500,
-        verbose_name="Shop Address"
+        max_length=100,
+        verbose_name="Shop Address",
+        null=True,
+        blank=True
     )
+    shop_country = models.CharField(
+        max_length=100,
+        verbose_name="SHOP STATE COUNTRY",
+        null=True,
+        blank=True
+    )
+    shop_state = models.CharField(
+        max_length=100,
+        verbose_name="SHOP STATE",
+        null=True,
+        blank=True
+    )
+
     shop_gst = models.CharField(
         max_length=15,
         verbose_name="GST NUMBER",
@@ -286,13 +302,27 @@ class ProprietorShop(BaseModel):
         default=False
     )
 
+    
     def __str__(self):
         return self.shop_name
     
     class Meta:
         ordering = ('-created_at',)
-
     
+    def save(self, *args, **kwargs):
+        data = get_geo_data(self.location.x, self.location.y)
+        self.shop_address = data['display_name']
+        self.shop_state=data.get('address', {}).get('state')
+        self.shop_country=data.get('address', {}).get('country')
+        super().save(*args, **kwargs)
+
+    @property
+    def longitude(self):
+        return self.location.x
+    @property
+    def latitude(self):
+        return self.location.y
+
 
     #todo to implement this feature in the api as well in the admin panel
     def clean(self):
