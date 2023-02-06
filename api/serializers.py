@@ -5,8 +5,8 @@ from django.http import QueryDict
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.gis.geos import Point
-from api.models import (AdminContact, CustomUser, DeviceToken, \
-    UserNotification,FrequentlyAskedQuestion,ProprietorShop)
+from api.models import (AdminContact, CustomUser, DeviceToken, 
+    UserNotification,FrequentlyAskedQuestion,ProprietorShop, VehicleDeliveryPerson)
 from base.utils import get_image_from_b64, phonenumber_validator, custom_password_validator
 from strings import *
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
@@ -230,6 +230,7 @@ class ShopSerializers(serializers.ModelSerializer):
             "shop_address",
             "shop_country",
             "shop_state",
+            "is_job_live",
         )
 
         read_only_fields =(
@@ -238,6 +239,7 @@ class ShopSerializers(serializers.ModelSerializer):
             "shop_address",
             "shop_country",
             "shop_state",
+            "is_job_live",
         )
 
     # """ this will add an extra field the list serializers"""
@@ -249,3 +251,15 @@ class ShopSerializers(serializers.ModelSerializer):
         obj = self.Meta.model(**validated_data)
         obj.full_clean()        
         return super().create(validated_data)
+    
+
+class VehicleListSerializers(serializers.ModelSerializer):
+    user = UserListSerializers(read_only = True)
+    class Meta:
+        model = VehicleDeliveryPerson
+        fields = (
+            'user',
+            'vehicle_type',
+            'vehicle_number',
+            'vehicle_name',
+        )

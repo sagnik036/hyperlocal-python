@@ -26,4 +26,5 @@ urlpatterns = [
     #m2 urls --->
     path('shopdata/',views.ShopListView.as_view()),
     path('shopdata/<str:pk>/',views.ShopDetailView.as_view()),
+    path('vehicledata/',views.VehicleListView.as_view()),
 ]
