@@ -44,6 +44,7 @@ from api.serializers import (AdminContactSerializer, CustomUserSerializer,
 from api.task import send_mail_task, send_notification_to_users, send_transactional_sms
 from strings import *
 from rest_framework.validators import ValidationError
+from rest_framework_gis.filters import DistanceToPointFilter
 # from .filters import ShopFilter
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -644,8 +645,9 @@ class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin
     permission_classes = (IsShopOwnerIsNot,)
     queryset = ProprietorShop.objects.all()
     serializer_class = ShopSerializers
-    filter_backends = [SearchFilter,]
-    search_fields = ('name','user_id',)
+    distance_filter_field = 'location'
+    filter_backends = (SearchFilter,DistanceToPointFilter,)
+    search_fields = ('shop_name','user__id',)
     
 
     def initial(self, request, *args, **kwargs):

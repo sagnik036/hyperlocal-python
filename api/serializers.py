@@ -200,9 +200,6 @@ class ShopListSerializers(serializers.ModelSerializer):
             "shop_shortdescribtion",
             "location",
             "shop_address",
-            "shop_country",
-            "shop_state",
-            "is_active"
         )
         read_only_fields =(
             "id",
@@ -211,9 +208,6 @@ class ShopListSerializers(serializers.ModelSerializer):
             "shop_shortdescribtion",
             "location",
             "shop_address",
-            "shop_country",
-            "shop_state",
-            "is_active"
         )
 
     
