@@ -237,6 +237,7 @@ class ProprietorShop(BaseModel):
         on_delete=models.CASCADE,
         limit_choices_to= {
             'user_type' : UserType.a.value[0],
+            'is_shop':True,
             'is_active'  : True
         },
         verbose_name="Proprietor",
@@ -295,11 +296,13 @@ class ProprietorShop(BaseModel):
     
     #todo we should make this false once we decide this feature
     is_active = models.BooleanField(
-        default= True
+        default= True,
+        verbose_name="IS ACTIVE"
     )
 
     is_job_live = models.BooleanField(
-        default=False
+        default=False,
+        verbose_name="IS JOB LIVE"
     )
 
     
@@ -352,13 +355,13 @@ class VehicleDeliveryPerson(BaseModel):
         verbose_name="DELIVERY-PERSON"
     )
     vehicle_type = models.CharField(
-        max_length=2,
-        choices=[x.value for x in UserType]
+        max_length=3,
+        choices=[x.value for x in VehicleType]
     )
     vehicle_number = models.CharField(
         max_length=10,
         null=True,
-        blank=True
+        blank=True,
     )
     vehicle_name = models.CharField(
         max_length=20,
@@ -368,20 +371,44 @@ class VehicleDeliveryPerson(BaseModel):
     # for now we can have this field default as True
 
     is_verified = models.BooleanField(
-        default=True
+        default=True,
+        verbose_name="IS VERIFIED"
     )
 
     #can have the permission to delete the vehicle and add new if we decide to add this in future
     is_active = models.BooleanField(
-        default=True
+        default=True,
+        verbose_name="IS ACTIVE"
     )
 
     is_job_live = models.BooleanField(
-        default=False
+        default=False,
+        verbose_name="IS JOB LIVE"
     )
 
     def __str__(self):
-        return self.vehicle_name
+        return self.vehicle_number
+    
+    #todo to implement this feature in the api as well in the admin panel
+    def clean(self):
+        if VehicleDeliveryPerson.objects.filter(
+                vehicle_number=self.vehicle_number,
+                is_active = True).exclude(id=self.id).exists():
+                raise ValidationError(VEHICLEEXISTS)
+        
+        if self.created_at:
+            if VehicleDeliveryPerson.objects.filter(
+                    user_id=self.user_id, 
+                    is_active=True,
+                    is_job_live = True
+                ).exists():
+                raise ValidationError(CANNOTPERFORM)
+        elif not self.created_at:
+            if VehicleDeliveryPerson.objects.filter(
+                        user_id=self.user_id, 
+                        is_active=True,
+                    ).exists():
+                raise ValidationError(VEHICLEALREADYHAVE)
     
     class Meta:
         ordering = ('-created_at',)

@@ -25,7 +25,8 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_gis.filters import GeoFilterSet
 from rest_framework.filters import SearchFilter
 
-from base.base_permissions import IsSuperUser, IsEmailNotVerified, IsShopOwnerIsNot
+from base.base_permissions import IsSuperUser, IsEmailNotVerified, \
+    IsShopOwnerIsNot,IsDeliveryPersonOrNot
 from base.base_views import (CustomAPIView, CustomCreateModelMixin,
                              CustomDestroyModelMixin, CustomGenericView,
                              CustomListModelMixin, CustomRetrieveModelMixin,
@@ -33,13 +34,14 @@ from base.base_views import (CustomAPIView, CustomCreateModelMixin,
 from base.choices import NotificationType
 from api.models import (AdminContact, CustomUser, DeviceToken, PaymentTerm,\
                         PrivacyPolicy, TermAndCondition, UserNotification,\
-                        FrequentlyAskedQuestion, ProprietorShop)
+                        FrequentlyAskedQuestion, ProprietorShop,VehicleDeliveryPerson)
 from base.utils import (CustomException, error_response, \
                         success_response, create_otp,phonenumber_validator)
 from api.serializers import (AdminContactSerializer, CustomUserSerializer,
                              DeviceTokenSerializer, TextSerializer,
                              UserNotificationSerializer,FrequentlyAskedQuestionSerializer,
-                             UserPasswordSerializer,ShopSerializers,ShopListSerializers)
+                             UserPasswordSerializer,ShopSerializers,ShopListSerializers,
+                             VehicleListSerializers,)
 
 from api.task import send_mail_task, send_notification_to_users, send_transactional_sms
 from strings import *
@@ -673,7 +675,7 @@ class ShopDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroyMod
     serializer_class = ShopSerializers
 
     def initial(self, request, *args, **kwargs):
-        if not request.method == "GET":
+        if request.method == "GET":
             self.permission_classes = (IsAuthenticated,)
         return super().initial(request, *args, **kwargs)
 
@@ -705,4 +707,26 @@ class ShopDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroyMod
             message="SUCCESS"
         )
     
+"""here we can list all the available vehicles"""
+class VehicleListView(CustomGenericView,CustomListModelMixin):
+    permission_classes = (IsDeliveryPersonOrNot,)
+    queryset = VehicleDeliveryPerson.objects.filter(is_active = True)
+    #todo change this to full vehicle serializers
+    serializer_class = VehicleListSerializers
+    filter_backends = (SearchFilter,)
+    search_fields = ('vehicle_number','vehicle_type','user__id',)
+
+    def initial(self, request, *args, **kwargs):
+        if request.method == "GET":
+            self.permission_classes = (IsAuthenticated,)
+        return super().initial(request, *args, **kwargs)
+    
+    """list all the delivery person details"""
+    def get(self, request, *args, **kwargs):
+        # todo uncomment this - after intregating the create api
+        # here the list serializers is called
+        # self.serializer_class = VehicleListSerializers
+        return self.list(request, *args, **kwargs)
+
+
     

@@ -6,7 +6,7 @@ from api.forms import ( PaymentTermForm,
                        PrivacyPolicyForm, TermForm, AdminNotificationForm)
 from api.models import (AdminContact, AdminNotification, CustomUser,
                         PaymentTerm, PrivacyPolicy, ProprietorShop, \
-                    TermAndCondition,FrequentlyAskedQuestion,
+                    TermAndCondition,FrequentlyAskedQuestion,VehicleDeliveryPerson
 )
 from django.core.exceptions import ValidationError
 
@@ -65,7 +65,7 @@ class PaymentTermAdmin(OneObjectAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
-        ('Credentials', {'fields': ('mobile_number','email', 'password')}),
+        ('Credentials', {'fields': ('mobile_number','email', 'password','user_type')}),
         ('Personal info', {'fields': ('first_name', 'last_name','profile_pic','is_shop','adhar_photo_front','adhar_photo_back')}),  
         ('Permissions', {
             'fields': ('is_active', 'is_superuser','is_adhar_verified'),
@@ -128,3 +128,13 @@ class ProprietorShopAdmin(LeafletGeoAdmin):
     #todo please make this False after the testing or in final phase of testing
     def has_delete_permission(self,request,obj=None):
         return True
+    
+@admin.register(VehicleDeliveryPerson)
+class VehicleAdmin(admin.ModelAdmin):
+    list_display = ('user','vehicle_number','vehicle_type','is_active')
+    list_filter = ('vehicle_type','is_active','is_job_live')
+
+    #todo please make this False after the testing or in final phase of testing
+    def has_delete_permission(self,request,obj=None):
+        return True
+
