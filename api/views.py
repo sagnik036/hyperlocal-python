@@ -41,7 +41,7 @@ from api.serializers import (AdminContactSerializer, CustomUserSerializer,
                              DeviceTokenSerializer, TextSerializer,
                              UserNotificationSerializer,FrequentlyAskedQuestionSerializer,
                              UserPasswordSerializer,ShopSerializers,ShopListSerializers,
-                             VehicleListSerializers,)
+                             VehicleListSerializers,VehicleSerializers)
 
 from api.task import send_mail_task, send_notification_to_users, send_transactional_sms
 from strings import *
@@ -708,11 +708,11 @@ class ShopDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroyMod
         )
     
 """here we can list all the available vehicles"""
-class VehicleListView(CustomGenericView,CustomListModelMixin):
+class VehicleListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin):
     permission_classes = (IsDeliveryPersonOrNot,)
     queryset = VehicleDeliveryPerson.objects.filter(is_active = True)
     #todo change this to full vehicle serializers
-    serializer_class = VehicleListSerializers
+    serializer_class = VehicleSerializers
     filter_backends = (SearchFilter,)
     search_fields = ('vehicle_number','vehicle_type','user__id',)
 
@@ -723,10 +723,30 @@ class VehicleListView(CustomGenericView,CustomListModelMixin):
     
     """list all the delivery person details"""
     def get(self, request, *args, **kwargs):
-        # todo uncomment this - after intregating the create api
         # here the list serializers is called
-        # self.serializer_class = VehicleListSerializers
+        self.serializer_class = VehicleListSerializers
         return self.list(request, *args, **kwargs)
+    
+    """register the vehicle details"""
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+class VehicleDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroyModelMixin):
+    permission_classes = (IsDeliveryPersonOrNot,)
+    queryset = VehicleDeliveryPerson.objects.all()
+    serializer_class = VehicleSerializers
+
+    def initial(self, request, *args, **kwargs):
+        if request.method == "GET":
+            self.permission_classes = (IsAuthenticated,)
+        return super().initial(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+
+
 
 
     
