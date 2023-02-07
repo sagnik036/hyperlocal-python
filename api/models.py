@@ -146,8 +146,7 @@ class CustomUser(AbstractUser):
     )
 
     #auto fields -> to be calculated
-    live_jobs_count = models.PositiveIntegerField(default=0)
-    total_jobs_posted = models.PositiveIntegerField(default=0)
+    jobs_count = models.PositiveIntegerField(default=0)
 
 
     # notification_setting = models.BooleanField(default=True)
@@ -293,6 +292,7 @@ class ProprietorShop(BaseModel):
         null=True,
         blank=True
     )
+    total_jobs_posted = models.PositiveIntegerField(default=0)
     
     #todo we should make this false once we decide this feature
     is_active = models.BooleanField(

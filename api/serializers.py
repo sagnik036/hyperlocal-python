@@ -121,8 +121,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'is_adhar_verified',
             'adhar_photo_front',
             'adhar_photo_back',
-            'live_jobs_count',
-            'total_jobs_posted',
+            'jobs_count',
             'is_email_verified',
             'is_mobile_verified',
             'profile_pic',
@@ -177,12 +176,8 @@ class UserListSerializers(serializers.ModelSerializer):
         model = CustomUser
         fields = (
             "id",
-            'date_joined',
             'first_name',
             'last_name',
-            'email',
-            'mobile_number',
-            'total_jobs_posted',
             'profile_pic',
         )
 
@@ -230,6 +225,7 @@ class ShopSerializers(serializers.ModelSerializer):
             "shop_address",
             "shop_country",
             "shop_state",
+            "total_jobs_posted",
             "is_job_live",
         )
 
@@ -238,6 +234,7 @@ class ShopSerializers(serializers.ModelSerializer):
             "is_active",
             "shop_address",
             "shop_country",
+            "total_jobs_posted",
             "shop_state",
             "is_job_live",
         )
