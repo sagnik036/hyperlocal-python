@@ -744,6 +744,9 @@ class VehicleDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroy
     
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        pass
 
 
 
