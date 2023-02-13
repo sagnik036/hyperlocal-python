@@ -245,6 +245,7 @@ class ProprietorShop(BaseModel):
     )
     shop_photo = models.ImageField(
         upload_to='images/', 
+        max_length=500,
         blank=True
     )
     shop_name = models.CharField(
