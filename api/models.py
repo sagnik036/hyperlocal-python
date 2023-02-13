@@ -130,10 +130,12 @@ class CustomUser(AbstractUser):
     
     #adharcard photo
     adhar_photo_front = models.ImageField(
+        max_length=500,
         upload_to='images/',
         verbose_name= "Adharcard front"
     )
     adhar_photo_back = models.ImageField(
+        max_length=500,
         upload_to='images/',
         verbose_name="Adharcard Back"
     )
