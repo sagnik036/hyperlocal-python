@@ -330,7 +330,7 @@ class ProprietorShop(BaseModel):
         return self.location.y
 
 
-    #todo to implement this feature in the api as well in the admin panel
+    #TODO to implement this feature in the api as well in the admin panel
     def clean(self):
         if self.created_at:
             if ProprietorShop.objects.filter(
@@ -370,7 +370,7 @@ class VehicleDeliveryPerson(BaseModel):
         max_length=20,
     )
 
-    #todo if possible we can check the vehicle number in future then tick this true \
+    #TODO if possible we can check the vehicle number in future then tick this true \
     # for now we can have this field default as True
 
     is_verified = models.BooleanField(
@@ -392,7 +392,7 @@ class VehicleDeliveryPerson(BaseModel):
     def __str__(self):
         return self.vehicle_number
     
-    #todo to implement this feature in the api as well in the admin panel
+    #TODO to implement this feature in the api as well in the admin panel
     def clean(self):
         if VehicleDeliveryPerson.objects.filter(
                 vehicle_number=self.vehicle_number,
