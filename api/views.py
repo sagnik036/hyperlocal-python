@@ -644,7 +644,7 @@ class UserList(CustomAPIView, BaseListView):
 
 """base view of shop here we can also register the shop"""
 class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin):
-    permission_classes = (IsShopOwnerIsNot,)
+    permission_classes = (IsAuthenticated,)
     queryset = ProprietorShop.objects.all()
     serializer_class = ShopSerializers
     distance_filter_field = 'location'
@@ -654,7 +654,8 @@ class ShopListView(CustomGenericView,CustomListModelMixin,CustomCreateModelMixin
 
     def initial(self, request, *args, **kwargs):
         if not request.method == "GET":
-            self.permission_classes = (IsAuthenticated,)
+            print(request.method)
+            self.permission_classes = (IsShopOwnerIsNot,)
         return super().initial(request, *args, **kwargs)
     
     """list all the shop details"""
