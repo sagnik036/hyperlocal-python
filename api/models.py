@@ -237,7 +237,7 @@ class ProprietorShop(BaseModel):
         CustomUser,
         on_delete=models.CASCADE,
         limit_choices_to= {
-            'user_type' : UserType.a.value[0],
+            'user_type' : UserType.PR.value[0],
             'is_shop':True,
             'is_active'  : True
         },
@@ -352,7 +352,7 @@ class VehicleDeliveryPerson(BaseModel):
         CustomUser,
         on_delete=models.CASCADE,
         limit_choices_to= {
-            'user_type' : UserType.b.value[0],
+            'user_type' : UserType.DP.value[0],
             'is_active'  : True
         },
         verbose_name="DELIVERY-PERSON"
@@ -371,7 +371,7 @@ class VehicleDeliveryPerson(BaseModel):
     )
 
     #TODO if possible we can check the vehicle number in future then tick this true \
-    # for now we can have this field default as True
+    #TODO for now we can have this field default as True
 
     is_verified = models.BooleanField(
         default=True,

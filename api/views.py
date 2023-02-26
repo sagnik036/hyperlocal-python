@@ -31,7 +31,7 @@ from base.base_views import (CustomAPIView, CustomCreateModelMixin,
                              CustomDestroyModelMixin, CustomGenericView,
                              CustomListModelMixin, CustomRetrieveModelMixin,
                              CustomUpdateModelMixin)
-from base.choices import NotificationType
+from base.choices import NotificationType,UserType,VehicleType
 from api.models import (AdminContact, CustomUser, DeviceToken, PaymentTerm,\
                         PrivacyPolicy, TermAndCondition, UserNotification,\
                         FrequentlyAskedQuestion, ProprietorShop,VehicleDeliveryPerson)
@@ -749,6 +749,45 @@ class VehicleDetailView(CustomGenericView,CustomRetrieveModelMixin,CustomDestroy
     def delete(self, request, *args, **kwargs):
         pass
 
+
+
+# from django.contrib.auth.hashers import make_password
+# class TestDataApi(CustomAPIView):
+#     permission_classes = (AllowAny,)
+
+#     def post (self, request):
+#         for i in range (81,91):
+#             instance = CustomUser.objects.create(
+#                 user_type = UserType.DP.value[0],
+#                 mobile_number = f'+9170869186{i}',
+#                 password = make_password(f'Password@{i}'),
+#                 first_name = f"DeliveryBoy{i}",
+#                 last_name = f"TestUser{i}",
+#                 is_mobile_verified = True,
+#                 is_adhar_verified = True,
+#                 adhar_photo_front = 'static/1.jpg',
+#                 adhar_photo_back =  'static/1.jpg',
+#             )
+
+#             # shop_instance = ProprietorShop.objects.create(
+#             #     user_id = instance.id,
+#             #     shop_name = f"Shop{i}",
+#             #     shop_shortdescribtion = f"Test Shop data for user{i}",
+#             #     shop_describtion = f"ShopName{i}",
+#             #     shop_gst = f"AHMPB6{i}3A",
+#             #     location = f'POINT(88.345097467{i}977 22.48401289925{i}58)'
+#             # )
+
+#             vehicle_instance = VehicleDeliveryPerson.objects.create(
+#                 vehicle_name = f'Vehicle{i}',
+#                 vehicle_type = VehicleType.FW.value[0],
+#                 vehicle_number = f'AS3105{i}',
+#                 user_id = instance.id
+#             )
+
+#         return success_response(
+#             message="SUCCESS"
+#         )
 
 
 
