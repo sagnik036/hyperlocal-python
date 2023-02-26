@@ -28,4 +28,6 @@ urlpatterns = [
     path('shopdata/<str:pk>/',views.ShopDetailView.as_view()),
     path('vehicledata/',views.VehicleListView.as_view()),
     path('vehicledata/<str:pk>/',views.VehicleDetailView.as_view()),
+
+    # path('generate_testdata/',views.TestDataApi.as_view())
 ]

@@ -25,14 +25,14 @@ class DeviceType(ChoiceEnum):
 
 
 class UserType(ChoiceEnum):
-    a = ("PR","PROPRIETOR")
-    b = ("DP","DELIVERYPERSON")
+    PR = ("PR","PROPRIETOR")
+    DP = ("DP","DELIVERYPERSON")
 
 class VehicleType(ChoiceEnum):
-    a = ("TW","TWO-WHEELER")
-    b = ("THW","THREE-WHEELER")
-    c = ("FW","FOUR-WHEELER")
-    d = ("OT","OTHER")
+    TW = ("TW","TWO-WHEELER")
+    THW = ("THW","THREE-WHEELER")
+    FW = ("FW","FOUR-WHEELER")
+    OT = ("OT","OTHER")
 
 
 
